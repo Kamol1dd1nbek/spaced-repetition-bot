@@ -53,21 +53,31 @@ async function clearTrash() {
 }
 
 async function formatText(text) {
-  return text.replace(/\.ol([\s\S]*?)\.\/ol/g, (match, content) => {
-    // is not working
-    const listItems = content.match(/\.li([\s\S]*?)\.\/li/g);
-    if (listItems) {
-      return listItems
-        .map((item, index) => {
-          // Replace .li with the numbered item
-          return `${index + 1}. ${item.replace(/\.li|\.\/li/g, "").trim()}`;
-        })
-        .join("\n");
+  const escapeChars = [
+    "\\",
+    "`",
+    "*",
+    "_",
+    "{",
+    "}",
+    "[",
+    "]",
+    "(",
+    ")",
+    "#",
+    "+",
+    "-",
+    "!",
+    ">",
+  ];
+  const escapePattern = new RegExp(`[${escapeChars.join("")}]`, "g");
+  let escapedText = text.replace(escapePattern, (match) => {
+    if (match === "." && /[cbiqn ]/.test(text[text.indexOf(match) + 1])) {
+      return match;
     }
-    return match;
+    return `\\${match}`;
   });
-  return text
-
+  text = escapedText;
   return text
     .replace(/\.c/g, "```")
     .replace(/\.b/g, "*")

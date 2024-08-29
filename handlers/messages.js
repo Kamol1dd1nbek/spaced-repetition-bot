@@ -11,18 +11,10 @@ export default async function onMessage(msg) {
   trash.setState((prev) => [...prev, msg.message_id]);
   let text = msg?.text;
 
-  //   console.log(await formatText(`
-  //   .ol
-  //   .li First item .li Second item .li Third item
-  //   .ol
-  // `))
-  // return sendMessage(await formatText(".ol .li piyoz .li kartoshka .\/ol"))
-
   switch (text) {
     case "➕ Add new":
       currentAction.setState(() => "addTitle");
       return sendMessage("📌 Please enter the *TITLE* :");
-      break;
   }
 
   switch (currentAction.getState()) {
@@ -50,20 +42,39 @@ export default async function onMessage(msg) {
         return sendMessage("⚠️ Body cannot be empty");
       }
       currentAction.setState(() => "checkNewRep");
-      newRepetition.setState((prev) => {
-        return { ...prev, body: text };
+      newRepetition.setState(async (prev) => {
+        return { ...prev, body: await formatText(text, false) };
       });
-      console.log(newRepetition.getState());
-      // console.log(
-      //   ...createInlineKeyboard([
-      //     { text: "❌ Cencel", callback_data: "cencel_adding" },
-      //     { text: "✅ Confirm", callback_data: "confirm_adding" },
-      //   ])
-      // );
       await clearTrash();
-      sendMessage(JSON.stringify(newRepetition), {
-        parse_mode: "HTML",
-      });
+      let keyboards = createInlineKeyboard([
+        [
+          { text: "❌ Cencel", callback_data: "cencel_adding" },
+          { text: "✅ Confirm", callback_data: "confirm_adding" },
+        ],
+      ]);
+      let newRepData = await newRepetition.getState();
+      sendMessage(
+        `
+📋 Please confirm the details you have provided:
+
+📌 Title: *${newRepData.title}*
+${
+  newRepData.subtitle !== undefined
+    ? `\n🖋️ Subtitle: ${newRepData.subtitle}\n`
+    : ""
+}
+📜 Body:\n
+${newRepData.body}
+`,
+        {
+          ...createInlineKeyboard([
+            [
+              { text: "❌ Cencel", callback_data: "cencel_adding" },
+              { text: "✅ Confirm", callback_data: "confirm_adding" },
+            ],
+          ]),
+        }
+      );
       break;
   }
 }
