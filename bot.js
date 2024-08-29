@@ -11,7 +11,7 @@ import connectDB from "./services/db.js";
 export const bot = new TelegramBot(config.BOT_TOKEN, { polling: true });
 
 // connect to database
-// connectDB(config.CONNECTION);
+connectDB(config.CONNECTION);
 
 bot.onText(/\/.*/, (msg) => onCommand(msg));
 bot.on("message", (msg) => onMessage(msg));
