@@ -1,7 +1,8 @@
 import { createState } from "../utils/helpers.js";
 
 const currentAction = createState("");
+const currentEditingPart = createState({});
 const newRepetition = createState({});
 const trash = createState([]);
 
-export { currentAction, newRepetition, trash };
+export { currentAction, currentEditingPart, newRepetition, trash };

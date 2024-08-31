@@ -12,7 +12,7 @@ import { connectDB } from "./services/index.js";
 export const bot = new TelegramBot(config.BOT_TOKEN, { polling: true });
 
 // connect to database
-connectDB(config.CONNECTION);
+// connectDB(config.CONNECTION);
 
 bot.onText(/\/.*/, (msg) => authMiddleware(msg.chat.id, msg, onCommand));
 bot.on("message", (msg) => authMiddleware(msg.chat.id, msg, onMessage));

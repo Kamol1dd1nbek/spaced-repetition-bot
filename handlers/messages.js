@@ -1,60 +1,97 @@
 import { bot } from "../bot.js";
-import { currentAction, newRepetition, trash } from "../states/state.js";
+import editMessageText from "../modules/editMessageText.js";
+import sendMessage from "../modules/sendMessage.js";
+import {
+  currentAction,
+  currentEditingPart,
+  newRepetition,
+  trash,
+} from "../states/state.js";
 import {
   clearTrash,
   createInlineKeyboard,
   formatText,
-  sendMessage,
 } from "../utils/helpers.js";
-
+// TODO: clean also here
 export default async function onMessage(msg) {
   trash.setState((prev) => [...prev, msg.message_id]);
+  const editingPart = currentEditingPart.getState();
+  let newRepData = await newRepetition.getState();
+  const chatId = msg.chat.id;
   let text = msg?.text;
+
+  switch (editingPart.name) {
+    case "title":
+      newRepData = await newRepetition.setState((prev) => {
+        return { ...prev, title: formatText(text) };
+      });
+      editMessageText(
+        chatId,
+        editingPart.messageId,
+        `
+📋 Please confirm the details you have provided:
+        
+📌 Title: *${newRepData.title}*
+${
+  newRepData.subtitle !== undefined
+    ? `\n🖋️ Subtitle: ${newRepData.subtitle}\n`
+    : ""
+}
+📜 Body:\n
+${newRepData.body}
+  `,
+        createInlineKeyboard([
+          [
+            { text: "❌ Cencel", callback_data: "cencel_adding" },
+            {
+              text: "Open Website", // Tugmada ko'rinadigan matn
+              url: "https://www.example.com", // Ochiladigan veb-sahifaning URL manzili
+            },
+            { text: "✅ Confirm", callback_data: "confirm_adding" },
+          ],
+        ]).reply_markup
+      );
+      break;
+  }
 
   switch (text) {
     case "➕ Add new":
-      currentAction.setState(() => "addTitle");
-      return sendMessage("📌 Please enter the *TITLE* :");
+      sendMessage(chatId, "📌 Please enter the *TITLE* :");
+      return currentAction.setState(() => "addTitle");
   }
 
   switch (currentAction.getState()) {
     case "addTitle":
       if (text.trim() === "") {
-        return sendMessage("⚠️ Title cannot be empty");
+        return sendMessage(chatId, "⚠️ Title cannot be empty");
       }
-      currentAction.setState(() => "addSubtitle");
       newRepetition.setState((prev) => {
-        return { ...prev, title: text };
+        return { ...prev, title: formatText(text) };
       });
-      sendMessage("🖋️ Please enter the *SUBTITLE* : ");
+      sendMessage(chatId, "🖋️ Please enter the *SUBTITLE* : ");
+      currentAction.setState(() => "addSubtitle");
       break;
+
     case "addSubtitle":
       if (text !== ".") {
         newRepetition.setState((prev) => {
-          return { ...prev, subtitle: text };
+          return { ...prev, subtitle: formatText(text) };
         });
       }
+      sendMessage(chatId, "📜 Please enter the *BODY* :");
       currentAction.setState(() => "addBody");
-      sendMessage("📜 Please enter the *BODY* :");
       break;
+
     case "addBody":
       if (text.trim() === "") {
-        return sendMessage("⚠️ Body cannot be empty");
+        return sendMessage(chatId, "⚠️ Body cannot be empty");
       }
-      currentAction.setState(() => "checkNewRep");
       newRepetition.setState(async (prev) => {
         return { ...prev, body: formatText(text, false) };
       });
       await clearTrash();
-      let keyboards = createInlineKeyboard([
-        [
-          { text: "❌ Cencel", callback_data: "cencel_adding" },
-          { text: "✅ Confirm", callback_data: "confirm_adding" },
-        ],
-      ]);
-      let newRepData = await newRepetition.getState();
-      console.log(newRepData);
       sendMessage(
+        chatId,
         `
 📋 Please confirm the details you have provided:
 
@@ -77,6 +114,7 @@ ${newRepData.body}
           ]),
         }
       );
+      currentAction.setState(() => "checkNewRep");
       break;
   }
 }
