@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const repetitionSchema = new mongoose.Schema({
   title: { type: String, required: true },
-  subTitle: { type: String, required: false },
+  subtitle: { type: String },
   body: { type: String, required: true },
   step: { type: Number, default: 1 },
   createdDate: { type: Date, default: Date.now },

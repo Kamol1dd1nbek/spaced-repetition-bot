@@ -6,17 +6,22 @@ import {
   onCallbackQuery,
   onEditMessage,
 } from "./handlers/index.js";
-import connectDB from "./services/db.js";
+import { authMiddleware } from "./modules/index.js";
+import { connectDB } from "./services/index.js";
 
 export const bot = new TelegramBot(config.BOT_TOKEN, { polling: true });
 
 // connect to database
 connectDB(config.CONNECTION);
 
-bot.onText(/\/.*/, (msg) => onCommand(msg));
-bot.on("message", (msg) => onMessage(msg));
-bot.on("callback_query", (callbackQuery) => onCallbackQuery(callbackQuery));
-bot.on("edited_message", (editedMessage) => onEditMessage(editedMessage));
+bot.onText(/\/.*/, (msg) => authMiddleware(msg.chat.id, msg, onCommand));
+bot.on("message", (msg) => authMiddleware(msg.chat.id, msg, onMessage));
+bot.on("callback_query", (callbackQuery) =>
+  authMiddleware(callbackQuery.message.chat.id, callbackQuery, onCallbackQuery)
+);
+bot.on("edited_message", (editedMessage) =>
+  authMiddleware(editedMessage.chat.id, editedMessage, onEditMessage)
+);
 bot.on("polling_error", (error) => {
   console.log(`Polling error: ${error.message}`);
 });

@@ -43,7 +43,7 @@ export default async function onMessage(msg) {
       }
       currentAction.setState(() => "checkNewRep");
       newRepetition.setState(async (prev) => {
-        return { ...prev, body: await formatText(text, false) };
+        return { ...prev, body: formatText(text, false) };
       });
       await clearTrash();
       let keyboards = createInlineKeyboard([
@@ -53,6 +53,7 @@ export default async function onMessage(msg) {
         ],
       ]);
       let newRepData = await newRepetition.getState();
+      console.log(newRepData);
       sendMessage(
         `
 📋 Please confirm the details you have provided:
@@ -70,6 +71,7 @@ ${newRepData.body}
           ...createInlineKeyboard([
             [
               { text: "❌ Cencel", callback_data: "cencel_adding" },
+              { text: "✏️ Edit", callback_data: "edit_adding" },
               { text: "✅ Confirm", callback_data: "confirm_adding" },
             ],
           ]),
