@@ -1,19 +1,14 @@
 import { bot } from "../bot.js";
 import editMessageText from "../modules/editMessageText.js";
 import sendMessage from "../modules/sendMessage.js";
-import {
-  currentAction,
-  currentEditingPart,
-  newRepetition,
-  trash,
-} from "../states/state.js";
+import { currentAction, newRepetition, trash } from "../states/state.js";
 import {
   clearTrash,
   createInlineKeyboard,
   createKeyboard,
   formatText,
 } from "../utils/helpers.js";
-// TODO: clean also here
+
 export default async function onMessage(msg) {
   await trash.setState((prev) => [
     ...prev,
@@ -22,24 +17,21 @@ export default async function onMessage(msg) {
   let newRepData = await newRepetition.getState();
   const chatId = msg.chat.id;
   let text = msg?.text;
-
-  switch (text) {
-    case "➕ Add new":
-      await clearTrash();
-      sendMessage(chatId, "📌 Please enter the *TITLE* :");
-      return currentAction.setState(() => "addTitle");
-  }
+  await clearTrash();
 
   switch (currentAction.getState()) {
     case "addTitle":
       if (text.trim() === "") {
-        return sendMessage(chatId, "⚠️ Title cannot be empty");
+        return sendMessage("⚠️ Title cannot be empty", chatId);
       }
       newRepetition.setState((prev) => {
         return { ...prev, title: formatText(text) };
       });
-      await clearTrash();
-      sendMessage(chatId, "🖋️ Please enter the *SUBTITLE* : ");
+      sendMessage("🖋️ Please enter the SUBTITLE : ", chatId, {
+        ...createInlineKeyboard([
+          [{ text: "Cencel", callback_data: "cencel_adding" }],
+        ]),
+      });
       currentAction.setState(() => "addSubtitle");
       break;
 
@@ -49,8 +41,11 @@ export default async function onMessage(msg) {
           return { ...prev, subtitle: formatText(text) };
         });
       }
-      await clearTrash();
-      sendMessage(chatId, "📜 Please enter the *BODY* :");
+      sendMessage("📜 Please enter the BODY :", chatId, {
+        ...createInlineKeyboard([
+          [{ text: "Cencel", callback_data: "cencel_adding" }],
+        ]),
+      });
       currentAction.setState(() => "addBody");
       break;
 
@@ -63,7 +58,6 @@ export default async function onMessage(msg) {
       });
       await clearTrash();
       sendMessage(
-        chatId,
         `
 📋 Please confirm the details you have provided:
 
@@ -76,6 +70,7 @@ ${
 📜 Body:\n
 ${newRepData.body}
 `,
+        chatId,
         {
           ...createKeyboard([["Add"]]),
           ...createInlineKeyboard([

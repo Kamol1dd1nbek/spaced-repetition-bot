@@ -1,9 +1,9 @@
 import { createState } from "../utils/helpers.js";
 
-const currentAction = createState("");
-const currentEditingPart = createState({});
-const newRepetition = createState({});
 const mainMessage = createState({});
+const isActive = createState(false);
+const currentAction = createState("");
+const newRepetition = createState({});
 const trash = createState([]);
 const repetitionsTimes = createState([
   "30 minutes",
@@ -23,4 +23,4 @@ const repetitionsTimes = createState([
   "180 days",
 ]);
 
-export { currentAction, currentEditingPart, newRepetition, trash, mainMessage };
+export { currentAction, isActive, newRepetition, trash, mainMessage };
