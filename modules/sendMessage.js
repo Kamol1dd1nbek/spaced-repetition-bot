@@ -6,5 +6,8 @@ export default async function sendMessage(chatId, msg, options) {
     parse_mode: "MarkdownV2",
     ...options,
   });
-  trash.setState((prev) => [...prev, sentMessage.message_id]);
+  await trash.setState((prev) => [
+    ...prev,
+    { chat_id: sentMessage.chat.id, message_id: sentMessage.message_id },
+  ]);
 }

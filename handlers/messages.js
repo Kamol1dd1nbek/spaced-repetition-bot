@@ -10,52 +10,22 @@ import {
 import {
   clearTrash,
   createInlineKeyboard,
+  createKeyboard,
   formatText,
 } from "../utils/helpers.js";
 // TODO: clean also here
 export default async function onMessage(msg) {
-  trash.setState((prev) => [...prev, msg.message_id]);
-  const editingPart = currentEditingPart.getState();
+  await trash.setState((prev) => [
+    ...prev,
+    { chat_id: msg.chat.id, message_id: msg.message_id },
+  ]);
   let newRepData = await newRepetition.getState();
   const chatId = msg.chat.id;
   let text = msg?.text;
 
-  switch (editingPart.name) {
-    case "title":
-      newRepData = await newRepetition.setState((prev) => {
-        return { ...prev, title: formatText(text) };
-      });
-      editMessageText(
-        chatId,
-        editingPart.messageId,
-        `
-📋 Please confirm the details you have provided:
-        
-📌 Title: *${newRepData.title}*
-${
-  newRepData.subtitle !== undefined
-    ? `\n🖋️ Subtitle: ${newRepData.subtitle}\n`
-    : ""
-}
-📜 Body:\n
-${newRepData.body}
-  `,
-        createInlineKeyboard([
-          [
-            { text: "❌ Cencel", callback_data: "cencel_adding" },
-            {
-              text: "Open Website", // Tugmada ko'rinadigan matn
-              url: "https://www.example.com", // Ochiladigan veb-sahifaning URL manzili
-            },
-            { text: "✅ Confirm", callback_data: "confirm_adding" },
-          ],
-        ]).reply_markup
-      );
-      break;
-  }
-
   switch (text) {
     case "➕ Add new":
+      await clearTrash();
       sendMessage(chatId, "📌 Please enter the *TITLE* :");
       return currentAction.setState(() => "addTitle");
   }
@@ -68,6 +38,7 @@ ${newRepData.body}
       newRepetition.setState((prev) => {
         return { ...prev, title: formatText(text) };
       });
+      await clearTrash();
       sendMessage(chatId, "🖋️ Please enter the *SUBTITLE* : ");
       currentAction.setState(() => "addSubtitle");
       break;
@@ -78,6 +49,7 @@ ${newRepData.body}
           return { ...prev, subtitle: formatText(text) };
         });
       }
+      await clearTrash();
       sendMessage(chatId, "📜 Please enter the *BODY* :");
       currentAction.setState(() => "addBody");
       break;
@@ -105,10 +77,14 @@ ${
 ${newRepData.body}
 `,
         {
+          ...createKeyboard([["Add"]]),
           ...createInlineKeyboard([
             [
               { text: "❌ Cencel", callback_data: "cencel_adding" },
-              { text: "✏️ Edit", callback_data: "edit_adding" },
+              {
+                text: "✏️ Edit",
+                web_app: { url: "https://github.com/Kamol1dd1nbek" },
+              },
               { text: "✅ Confirm", callback_data: "confirm_adding" },
             ],
           ]),
