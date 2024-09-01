@@ -35,7 +35,6 @@ function createInlineKeyboard(buttons) {
   };
 }
 
-// TODO: don't use for to remove messages instance of it use deleteMessages()
 async function clearTrash() {
   try {
     for (let message_id of trash.getState()) {
@@ -47,7 +46,6 @@ async function clearTrash() {
 }
 
 function formatText(text) {
-  // Birinchi bosqich: .c, .b, .i, .u, .s va link almashtirishni qo'llash
   text = text
     .replace(/\.c(.*?)\.c/g, "```$1```")
     .replace(/\.b(.*?)\.b/g, "*$1*")
