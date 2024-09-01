@@ -1,6 +1,10 @@
 import Repetition from "../models/Repetition.js";
-import { currentEditingPart, newRepetition } from "../states/state.js";
-import { createInlineKeyboard } from "../utils/helpers.js";
+import { currentAction, newRepetition } from "../states/state.js";
+import {
+  clearTrash,
+  createInlineKeyboard,
+  createKeyboard,
+} from "../utils/helpers.js";
 import { bot } from "../bot.js";
 import answerCallbackQuery from "../modules/answerCallbackQuery.js";
 import editMessageReplyMarkup from "../modules/editMessageReplyMarkup.js";
@@ -13,36 +17,54 @@ export default async function onCallbackQuery(callbackQuery) {
   const newRepData = await newRepetition.getState();
 
   switch (data) {
+    case "add_new":
+      await currentAction.setState(() => "addTitle");
+      await sendMessage("📌 Please enter the TITLE :", chatId, {
+        ...createInlineKeyboard([
+          [{ text: "Cencel", callback_data: "cencel_adding" }],
+        ]),
+      });
+      await answerCallbackQuery(callbackQuery.id, "Enter repetitions data");
+      break;
+
     case "cencel_adding":
-      newRepetition.setState(() => {});
-      break;
-// TODO: write responsible query data format as `again_${repetition.id}`
-    case "edit_adding":
-      await editMessageReplyMarkup(
-        createInlineKeyboard([
+      await newRepetition.setState(() => {});
+      await sendMessage("Adding information has been cancelled", chatId, {
+        ...createInlineKeyboard([
           [
-            { text: "📌 Title", callback_data: "edit_title_adding" },
-            ...(newRepData.subtitle
-              ? [
-                  {
-                    text: "🖋️ Subtitle",
-                    callback_data: "edit_subtitle_adding",
-                  },
-                ]
-              : []),
-            { text: "📜 Body", callback_data: "edit_body_adding" },
+            {
+              text: "➕ Add new",
+              callback_data: "add_new",
+            },
           ],
-          [{ text: "🔙", callback_data: "back_adding" }],
-        ]).reply_markup,
-        chatId,
-        messageId
-      );
+        ]),
+      });
       break;
+
+    // case "edit_adding":
+    //   await editMessageReplyMarkup(
+    //     createInlineKeyboard([
+    //       [
+    //         { text: "📌 Title", callback_data: "edit_title_adding" },
+    //         ...(newRepData.subtitle
+    //           ? [
+    //               {
+    //                 text: "🖋️ Subtitle",
+    //                 callback_data: "edit_subtitle_adding",
+    //               },
+    //             ]
+    //           : []),
+    //         { text: "📜 Body", callback_data: "edit_body_adding" },
+    //       ],
+    //       [{ text: "🔙", callback_data: "back_adding" }],
+    //     ]).reply_markup,
+    //     chatId,
+    //     messageId
+    //   );
+    //   break;
 
     case "confirm_adding":
       try {
-        // await new Repetition(await newRepetition.getState()).save();
-        editMessageReplyMarkup(createInlineKeyboard([]), chatId, messageId);
         answerCallbackQuery(callbackQuery.id, "💾 Saved!");
       } catch (error) {
         console.log(
@@ -56,32 +78,12 @@ export default async function onCallbackQuery(callbackQuery) {
       }
       newRepetition.setState(() => {});
       break;
-
-    case "back_adding":
-      await editMessageReplyMarkup(
-        createInlineKeyboard([
-          [
-            { text: "❌ Cencel", callback_data: "cencel_adding" },
-            {
-              text: "✏️ Edit", // Tugmada ko'rinadigan matn
-              web_app: { url: "https://www.example.com" } // Ochiladigan veb-sahifaning URL manzili
-            },
-            { text: "✅ Confirm", callback_data: "confirm_adding" },
-          ],
-        ]).reply_markup,
-        chatId,
-        messageId
-      );
-      break;
-
-    case "edit_title_adding":
-      currentEditingPart.setState(() => {
-        return { name: "title", messageId };
-      });
-      sendMessage(
-        chatId,
-        `Current title\\: ${newRepData.title}\nPlease enter a new title\\:`
-      );
-      break;
   }
 }
+
+// ❌ false
+// ✅ true
+// Row 2:
+// 🔄 again
+// 😎 easy
+// ➡️ next

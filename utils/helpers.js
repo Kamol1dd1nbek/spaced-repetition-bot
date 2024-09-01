@@ -1,8 +1,6 @@
 import { bot } from "../bot.js";
 import { trash } from "../states/state.js";
 
-let chatId = 5117003387;
-
 function createState(data) {
   return {
     data: data,
@@ -36,12 +34,19 @@ function createInlineKeyboard(buttons) {
 }
 
 async function clearTrash() {
-  try {
-    for (let message_id of trash.getState()) {
-      await bot.deleteMessage(chatId, message_id);
+  for (let message of trash.getState()) {
+    try {
+      await bot.deleteMessage(message.chat_id, message.message_id);
+      await trash.setState((prev) =>
+        prev.filter(
+          (msg) =>
+            msg.chat_id !== message.chat_id &&
+            msg.message_id !== message.message_id
+        )
+      );
+    } catch (error) {
+      console.log(error.message);
     }
-  } catch (error) {
-    console.log("Error on delete message: ", error.message);
   }
 }
 
