@@ -1,6 +1,5 @@
 import { bot } from "../bot.js";
 import sendMessage from "../modules/sendMessage.js";
-import { isActive } from "../states/state.js";
 import { createInlineKeyboard } from "../utils/helpers.js";
 
 export default async function onCommand(msg) {

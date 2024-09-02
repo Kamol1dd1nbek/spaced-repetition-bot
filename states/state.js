@@ -1,7 +1,7 @@
 import { createState } from "../utils/helpers.js";
 
 const mainMessage = createState({});
-const isActive = createState(false);
+const isFormated = createState(false);
 const currentAction = createState("");
 const newRepetition = createState({});
 const trash = createState([]);
@@ -23,4 +23,4 @@ const repetitionsTimes = createState([
   "180 days",
 ]);
 
-export { currentAction, isActive, newRepetition, trash, mainMessage };
+export { currentAction, isFormated, newRepetition, trash, mainMessage };

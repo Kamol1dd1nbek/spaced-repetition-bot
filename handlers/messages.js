@@ -1,7 +1,7 @@
 import { bot } from "../bot.js";
 import editMessageText from "../modules/editMessageText.js";
 import sendMessage from "../modules/sendMessage.js";
-import { currentAction, newRepetition, trash } from "../states/state.js";
+import { currentAction, isFormated, newRepetition, trash } from "../states/state.js";
 import {
   clearTrash,
   createInlineKeyboard,
@@ -25,9 +25,9 @@ export default async function onMessage(msg) {
         return sendMessage("⚠️ Title cannot be empty", chatId);
       }
       newRepetition.setState((prev) => {
-        return { ...prev, title: formatText(text) };
+        return { ...prev, title: text };
       });
-      sendMessage("🖋️ Please enter the SUBTITLE : ", chatId, {
+      sendMessage("🖋️ Please enter the SUBTITLE ", chatId, {
         ...createInlineKeyboard([
           [{ text: "Cencel", callback_data: "cencel_adding" }],
         ]),
@@ -38,7 +38,7 @@ export default async function onMessage(msg) {
     case "addSubtitle":
       if (text !== ".") {
         newRepetition.setState((prev) => {
-          return { ...prev, subtitle: formatText(text) };
+          return { ...prev, subtitle: text };
         });
       }
       sendMessage("📜 Please enter the BODY :", chatId, {
@@ -51,12 +51,14 @@ export default async function onMessage(msg) {
 
     case "addBody":
       if (text.trim() === "") {
-        return sendMessage(chatId, "⚠️ Body cannot be empty");
+        return sendMessage("⚠️ Body cannot be empty", chatId);
       }
-      newRepetition.setState(async (prev) => {
-        return { ...prev, body: formatText(text, false) };
+      await newRepetition.setState(async (prev) => {
+        return { ...prev, body: await formatText(text) };
       });
+      newRepData = await newRepetition.getState();
       await clearTrash();
+      await isFormated.setState(() => true);
       sendMessage(
         `
 📋 Please confirm the details you have provided:

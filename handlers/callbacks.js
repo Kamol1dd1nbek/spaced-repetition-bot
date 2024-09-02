@@ -41,28 +41,6 @@ export default async function onCallbackQuery(callbackQuery) {
       });
       break;
 
-    // case "edit_adding":
-    //   await editMessageReplyMarkup(
-    //     createInlineKeyboard([
-    //       [
-    //         { text: "📌 Title", callback_data: "edit_title_adding" },
-    //         ...(newRepData.subtitle
-    //           ? [
-    //               {
-    //                 text: "🖋️ Subtitle",
-    //                 callback_data: "edit_subtitle_adding",
-    //               },
-    //             ]
-    //           : []),
-    //         { text: "📜 Body", callback_data: "edit_body_adding" },
-    //       ],
-    //       [{ text: "🔙", callback_data: "back_adding" }],
-    //     ]).reply_markup,
-    //     chatId,
-    //     messageId
-    //   );
-    //   break;
-
     case "confirm_adding":
       try {
         answerCallbackQuery(callbackQuery.id, "💾 Saved!");
