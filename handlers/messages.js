@@ -21,7 +21,7 @@ export default async function onMessage(msg) {
   // ]);
   let newRepData = await context.getContext(chatId, "newRepetition");
   // let newRepData = await newRepetition.getState();
-  await clearTrash(chatId);
+  
 
   switch (await context.getContext(chatId, "currentAction")) {
     case "addTitle":
@@ -110,4 +110,6 @@ ${newRepData.body}
       // currentAction.setState(() => "checkNewRep");
       break;
   }
+
+  await clearTrash(chatId);
 }

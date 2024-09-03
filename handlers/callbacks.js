@@ -200,6 +200,7 @@ ${thisRepetition.body}
           totalPages: oldRepetitions.totalPages,
         };
       });
+      
       // paginationData = await pagination.setState(() => {
       //   return {
       //     currentPage: oldRepetitions.currentPage,
@@ -230,8 +231,8 @@ ${thisRepetition.body}
               })
             ),
             createPaginationBtns(
-              paginationData.currentPage,
-              paginationData.totalPages
+              paginationData.pagination.currentPage,
+              paginationData.pagination.totalPages
             ),
             [{ text: "🔙", callback_data: "get_list" }],
           ]),
