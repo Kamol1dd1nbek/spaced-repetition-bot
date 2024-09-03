@@ -5,8 +5,12 @@ export default async function answerCallbackQuery(
   text,
   showAlert = false
 ) {
-  await bot.answerCallbackQuery(queryId, {
-    text,
-    showAlert,
-  });
+  try {
+    await bot.answerCallbackQuery(queryId, {
+      text,
+      showAlert,
+    });
+  } catch (error) {
+    console.log(error.message);
+  }
 }

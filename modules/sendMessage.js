@@ -1,9 +1,10 @@
 import { bot } from "../bot.js";
-import { isFormated, mainMessage } from "../states/state.js";
+import { context, isFormated, mainMessage } from "../states/state.js";
 
 export default async function sendMessage(msg, chatId, options) {
-  const mainMsg = await mainMessage.getState();
-  const isFormatedtext = await isFormated.getState();
+  const mainMsg = await context.getContext(chatId, "mainMessage");
+  const isFormatedtext = await context.getContext(chatId, "isFormated");
+  // const isFormatedtext = await isFormated.getState();
 
   if (Object.keys(mainMsg).length && !isFormatedtext) {
     try {
@@ -12,7 +13,8 @@ export default async function sendMessage(msg, chatId, options) {
         message_id: mainMsg.message_id,
         ...options,
       });
-      await mainMessage.setState(() => editedMsg);
+      await context.setContext(chatId, "mainMessage", () => editedMsg);
+      // await mainMessage.setState(() => editedMsg);
     } catch (error) {
       console.log(error.message);
     }
@@ -22,15 +24,18 @@ export default async function sendMessage(msg, chatId, options) {
       ...options,
     });
     await bot.deleteMessage(chatId, mainMsg.message_id);
-    await mainMessage.setState(() => sentMessage);
-    await isFormated.setState(() => false);
+    await context.setContext(chatId, "mainMessage", () => sentMessage);
+    // await mainMessage.setState(() => sentMessage);
+    await context.setContext(chatId, "isFormated", () => false);
+    // await isFormated.setState(() => false);
   } else {
     try {
       const sentMsg = await bot.sendMessage(chatId, msg, {
         parse_mode: "MarkdownV2",
         ...options,
       });
-      await mainMessage.setState(() => sentMsg);
+      await context.setContext(chatId, "mainMessage", () => sentMsg);
+      // await mainMessage.setState(() => sentMsg);
     } catch (error) {
       console.log(error.message);
     }

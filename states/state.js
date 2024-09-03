@@ -1,11 +1,15 @@
-import { createState } from "../utils/helpers.js";
-
-const mainMessage = createState({});
+import { createContext, createState } from "../utils/helpers.js";
+const context = createContext();
+const mainMessage = createState();
 const isFormated = createState(false);
 const currentAction = createState("");
+const isRepetitioning = createState(false);
+const timeoutId = createState(null);
 const newRepetition = createState({});
 const trash = createState([]);
+const pagination = createState({currentPage: 1});
 const repetitionsTimes = createState([
+  "10 minute",
   "30 minutes",
   "1 hour",
   "2 hours",
@@ -23,4 +27,15 @@ const repetitionsTimes = createState([
   "180 days",
 ]);
 
-export { currentAction, isFormated, newRepetition, trash, mainMessage };
+export {
+  currentAction,
+  isFormated,
+  newRepetition,
+  trash,
+  mainMessage,
+  repetitionsTimes,
+  pagination,
+  timeoutId,
+  isRepetitioning,
+  context
+};

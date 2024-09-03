@@ -1,49 +1,108 @@
-import Repetition from "../models/Repetition.js";
-import { currentAction, newRepetition } from "../states/state.js";
 import {
-  clearTrash,
+  context,
+  currentAction,
+  isFormated,
+  newRepetition,
+  pagination,
+  repetitionsTimes,
+} from "../states/state.js";
+import {
+  addTimeStringToDate,
   createInlineKeyboard,
-  createKeyboard,
+  createPaginationBtns,
+  splitArray,
 } from "../utils/helpers.js";
 import { bot } from "../bot.js";
 import answerCallbackQuery from "../modules/answerCallbackQuery.js";
-import editMessageReplyMarkup from "../modules/editMessageReplyMarkup.js";
 import sendMessage from "../modules/sendMessage.js";
-// TODO: clean here
+import {
+  findRepetitionById,
+  getOldRepetitions,
+  saveRepetition,
+} from "../services/repetitionService.js";
+import show_menu from "../modules/show_menu.js";
+
 export default async function onCallbackQuery(callbackQuery) {
   const data = callbackQuery.data;
+  const queryId = callbackQuery.id;
   const chatId = callbackQuery.message.chat.id;
-  const messageId = callbackQuery.message.message_id;
-  const newRepData = await newRepetition.getState();
+  let repetitionId,
+    repetition,
+    timesList,
+    nextRepetitionDate,
+    paginationData,
+    oldRepetitions;
 
-  switch (data) {
-    case "add_new":
-      await currentAction.setState(() => "addTitle");
+  switch (true) {
+    case data === "add_new":
+      await context.setContext(chatId, "currentAction", (user) => "addTitle");
+      // await currentAction.setState(() => "addTitle");
       await sendMessage("📌 Please enter the TITLE :", chatId, {
         ...createInlineKeyboard([
           [{ text: "Cencel", callback_data: "cencel_adding" }],
         ]),
       });
-      await answerCallbackQuery(callbackQuery.id, "Enter repetitions data");
+      await answerCallbackQuery(queryId, "Enter repetitions data");
       break;
 
-    case "cencel_adding":
-      await newRepetition.setState(() => {});
-      await sendMessage("Adding information has been cancelled", chatId, {
-        ...createInlineKeyboard([
-          [
-            {
-              text: "➕ Add new",
-              callback_data: "add_new",
-            },
-          ],
-        ]),
+    case data === "cencel_adding":
+      await context.setContext(chatId, "newRepetition", (user) => {
+        return {};
       });
+      // await newRepetition.setState(() => {});
+      await show_menu(queryId, chatId);
+      await answerCallbackQuery(queryId, "Cencelled!");
       break;
 
-    case "confirm_adding":
+    case data === "confirm_adding":
       try {
-        answerCallbackQuery(callbackQuery.id, "💾 Saved!");
+        const thisRepetition = await saveRepetition(chatId);
+        await answerCallbackQuery(queryId, "💾 Saved!");
+        await context.setContext(chatId, "isFormated", () => true);
+        // await isFormated.setState(() => true);
+        await sendMessage(
+          `
+🧠 Repeat this:
+          
+📌 Title: *${thisRepetition.title}*
+${
+  thisRepetition.subtitle !== undefined
+    ? `\n🖋️ Subtitle: ${thisRepetition.subtitle}\n`
+    : ""
+}
+📜 Body:\n
+${thisRepetition.body}
+          `,
+          chatId,
+          {
+            ...createInlineKeyboard([
+              [
+                {
+                  text: "❌ False",
+                  callback_data: `false_${thisRepetition._id}`,
+                },
+                {
+                  text: "✅ True",
+                  callback_data: `true_${thisRepetition._id}`,
+                },
+              ],
+              [
+                {
+                  text: "🔄 Again",
+                  callback_data: `again_${thisRepetition._id}`,
+                },
+                {
+                  text: "😎 Easy",
+                  callback_data: `easy_${thisRepetition._id}`,
+                },
+                {
+                  text: "📋 Others",
+                  callback_data: `get_list`,
+                },
+              ],
+            ]),
+          }
+        );
       } catch (error) {
         console.log(
           ">> On saving new repetition: (callback.js) >> ",
@@ -54,14 +113,236 @@ export default async function onCallbackQuery(callbackQuery) {
           show_alert: true,
         });
       }
-      newRepetition.setState(() => {});
+      await context.setContext(chatId, "newRepetition", (user) => {
+        return {};
+      });
+      // newRepetition.setState(() => {});
+      break;
+
+    case data.startsWith("false_"):
+      repetitionId = data.split("_")[1];
+      repetition = await findRepetitionById(repetitionId, chatId);
+      if (!repetition)
+        return answerCallbackQuery(queryId, "Repetition not found");
+      repetition.step = 1;
+      timesList = await repetitionsTimes.getState();
+      nextRepetitionDate = addTimeStringToDate(
+        new Date(),
+        timesList[repetition.step]
+      );
+      repetition.nextRepetition = nextRepetitionDate;
+      await repetition.save();
+      await show_menu(queryId, chatId);
+      await answerCallbackQuery(queryId, "Next repetition date updated");
+      break;
+
+    case data.startsWith("true_"):
+      repetitionId = data.split("_")[1];
+      repetition = await findRepetitionById(repetitionId, chatId);
+      if (!repetition)
+        return answerCallbackQuery(queryId, "Repetition not found");
+      repetition.step = repetition.step + 1;
+      timesList = await repetitionsTimes.getState();
+      nextRepetitionDate = addTimeStringToDate(
+        new Date(),
+        timesList[repetition.step]
+      );
+      repetition.nextRepetition = nextRepetitionDate;
+      await repetition.save();
+      await show_menu(queryId, chatId);
+      await answerCallbackQuery(queryId, "Next repetition date updated");
+      break;
+
+    case data.startsWith("again_"):
+      repetitionId = data.split("_")[1];
+      repetition = await findRepetitionById(repetitionId, chatId);
+      if (!repetition)
+        return answerCallbackQuery(queryId, "Repetition not found");
+      timesList = await repetitionsTimes.getState();
+      nextRepetitionDate = addTimeStringToDate(new Date(), timesList[0]);
+      repetition.nextRepetition = nextRepetitionDate;
+      await repetition.save();
+      await show_menu(queryId, chatId);
+      await answerCallbackQuery(queryId, "Reminder after 10 minutes");
+      break;
+
+    case data.startsWith("easy_"):
+      repetitionId = data.split("_")[1];
+      repetition = await findRepetitionById(repetitionId, chatId);
+      if (!repetition)
+        return answerCallbackQuery(queryId, "Repetition not found");
+      repetition.step = repetition.step + 2;
+      timesList = await repetitionsTimes.getState();
+      nextRepetitionDate = addTimeStringToDate(
+        new Date(),
+        timesList[repetition.step]
+      );
+      repetition.nextRepetition = nextRepetitionDate;
+      await repetition.save();
+      await show_menu(queryId, chatId);
+      await answerCallbackQuery(queryId, "Next repetition date updated");
+      break;
+
+    case data === "get_list":
+      await show_menu(queryId, chatId);
+      break;
+
+    case data === "show_list":
+      paginationData = await context.getContext(chatId, "pagination");
+      // paginationData = await pagination.getState();
+      oldRepetitions = await getOldRepetitions(
+        chatId,
+        paginationData.currentPage
+      );
+      paginationData = await context.setContext(chatId, "pagination", () => {
+        return {
+          currentPage: oldRepetitions.currentPage,
+          totalPages: oldRepetitions.totalPages,
+        };
+      });
+      // paginationData = await pagination.setState(() => {
+      //   return {
+      //     currentPage: oldRepetitions.currentPage,
+      //     totalPages: oldRepetitions.totalPages,
+      //   };
+      // });
+      await context.setContext(chatId, "isFormated", (user) => true);
+      // isFormated.setState(() => true);
+      sendMessage(
+        `
+      Complete tasks on time❗️
+      ${oldRepetitions.data.map(
+        (rep, index) =>
+          `\n${index + 1}\\. *${rep.title}*${
+            rep?.subtitle ? `\n\\- ${rep.subtitle}` : ""
+          }`
+      )}
+      `,
+        chatId,
+        {
+          ...createInlineKeyboard([
+            ...splitArray(
+              oldRepetitions.data.map((rep, index) => {
+                return {
+                  text: `${index + 1}`,
+                  callback_data: `repe_${rep._id}`,
+                };
+              })
+            ),
+            createPaginationBtns(
+              paginationData.currentPage,
+              paginationData.totalPages
+            ),
+            [{ text: "🔙", callback_data: "get_list" }],
+          ]),
+        }
+      );
+      answerCallbackQuery(queryId, "");
+      break;
+
+    case data.startsWith("page_"):
+      let page = data.split("_")[1];
+      paginationData = await context.getContext(chatId, "pagination");
+      // paginationData = await pagination.getState();
+      oldRepetitions = await getOldRepetitions(chatId, page);
+      paginationData = await context.setContext(chatId, "pagination", () => {
+        return {
+          currentPage: page,
+          totalPages: oldRepetitions.totalPages,
+        };
+      });
+      // paginationData = await pagination.setState(() => {
+      //   return { currentPage: page, totalPages: oldRepetitions.totalPages };
+      // });
+      await context.setContext(chatId, "isFormated", (user) => true);
+      // isFormated.setState(() => true);
+      sendMessage(
+        `
+      Complete tasks on time❗️
+      ${oldRepetitions.data.map(
+        (rep, index) =>
+          `\n${index + 1}\\. *${rep.title}*${
+            rep?.subtitle ? `\n\\- ${rep.subtitle}` : ""
+          }`
+      )}
+      `,
+        chatId,
+        {
+          ...createInlineKeyboard([
+            ...splitArray(
+              oldRepetitions.data.map((rep, index) => {
+                return {
+                  text: `${index + 1}`,
+                  callback_data: `repe_${rep._id}`,
+                };
+              })
+            ),
+            createPaginationBtns(
+              paginationData.currentPage,
+              paginationData.totalPages
+            ),
+          ]),
+        }
+      );
+      answerCallbackQuery(queryId, "");
+      break;
+
+    case data.startsWith("repe_"):
+      repetitionId = data.split("_")[1];
+      let thisRepetition = await findRepetitionById(repetitionId, chatId);
+      if (!thisRepetition)
+        return answerCallbackQuery(queryId, "Repetition not found!");
+      answerCallbackQuery(queryId, "Loading ...");
+      await context.setContext(chatId, "isFormated", () => true);
+      // await isFormated.setState(() => true);
+      await sendMessage(
+        `
+🧠 Repeat this:
+        
+📌 Title: *${thisRepetition.title}*
+${
+  thisRepetition.subtitle !== undefined
+    ? `\n🖋️ Subtitle: ${thisRepetition.subtitle}\n`
+    : ""
+}
+📜 Body:\n
+${thisRepetition.body}
+        `,
+        chatId,
+        {
+          ...createInlineKeyboard([
+            [
+              {
+                text: "❌ False",
+                callback_data: `false_${thisRepetition._id}`,
+              },
+              {
+                text: "✅ True",
+                callback_data: `true_${thisRepetition._id}`,
+              },
+            ],
+            [
+              {
+                text: "🔄 Again",
+                callback_data: `again_${thisRepetition._id}`,
+              },
+              {
+                text: "😎 Easy",
+                callback_data: `easy_${thisRepetition._id}`,
+              },
+              {
+                text: "📋 Others",
+                callback_data: `get_list`,
+              },
+            ],
+          ]),
+        }
+      );
+
+      break;
+
+    case data === "noop":
+      await answerCallbackQuery(queryId, "");
       break;
   }
 }
-
-// ❌ false
-// ✅ true
-// Row 2:
-// 🔄 again
-// 😎 easy
-// ➡️ next

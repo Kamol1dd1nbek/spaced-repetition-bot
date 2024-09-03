@@ -1,7 +1,5 @@
-import { bot } from "../bot.js";
-import editMessageText from "../modules/editMessageText.js";
 import sendMessage from "../modules/sendMessage.js";
-import { currentAction, isFormated, newRepetition, trash } from "../states/state.js";
+import { context } from "../states/state.js";
 import {
   clearTrash,
   createInlineKeyboard,
@@ -10,55 +8,76 @@ import {
 } from "../utils/helpers.js";
 
 export default async function onMessage(msg) {
-  await trash.setState((prev) => [
-    ...prev,
-    { chat_id: msg.chat.id, message_id: msg.message_id },
-  ]);
-  let newRepData = await newRepetition.getState();
   const chatId = msg.chat.id;
   let text = msg?.text;
-  await clearTrash();
 
-  switch (currentAction.getState()) {
+  await context.setContext(chatId, "trash", (trash) => [
+    ...trash,
+    { chat_id: chatId, message_id: msg.message_id },
+  ]);
+  // await trash.setState((prev) => [
+  //   ...prev,
+  //   { chat_id: msg.chat.id, message_id: msg.message_id },
+  // ]);
+  let newRepData = await context.getContext(chatId, "newRepetition");
+  // let newRepData = await newRepetition.getState();
+  await clearTrash(chatId);
+
+  switch (await context.getContext(chatId, "currentAction")) {
     case "addTitle":
       if (text.trim() === "") {
         return sendMessage("⚠️ Title cannot be empty", chatId);
       }
-      newRepetition.setState((prev) => {
-        return { ...prev, title: text };
+      await context.setContext(chatId, "newRepetition", (prevRepetition) => {
+        return { ...prevRepetition, title: text, chatId };
       });
+      // newRepetition.setState((prev) => {
+      //   return { ...prev, title: text, chatId };
+      // });
       sendMessage("🖋️ Please enter the SUBTITLE ", chatId, {
         ...createInlineKeyboard([
           [{ text: "Cencel", callback_data: "cencel_adding" }],
         ]),
       });
-      currentAction.setState(() => "addSubtitle");
+      await context.setContext(chatId, "currentAction", () => "addSubtitle");
+      // currentAction.setState(() => "addSubtitle");
       break;
 
     case "addSubtitle":
       if (text !== ".") {
-        newRepetition.setState((prev) => {
-          return { ...prev, subtitle: text };
+        await context.setContext(chatId, "newRepetition", (prevRepetition) => {
+          return { ...prevRepetition, subtitle: text };
         });
+        // newRepetition.setState((prev) => {
+        //   return { ...prev, subtitle: text };
+        // });
       }
       sendMessage("📜 Please enter the BODY :", chatId, {
         ...createInlineKeyboard([
           [{ text: "Cencel", callback_data: "cencel_adding" }],
         ]),
       });
-      currentAction.setState(() => "addBody");
+      await context.setContext(chatId, "currentAction", () => "addBody");
+      // currentAction.setState(() => "addBody");
       break;
 
     case "addBody":
       if (text.trim() === "") {
         return sendMessage("⚠️ Body cannot be empty", chatId);
       }
-      await newRepetition.setState(async (prev) => {
-        return { ...prev, body: await formatText(text) };
+      await context.setContext(chatId, "newRepetition", (prevRepetition) => {
+        console.log(prevRepetition);
+        
+        return { ...prevRepetition, body: formatText(text) };
       });
-      newRepData = await newRepetition.getState();
-      await clearTrash();
-      await isFormated.setState(() => true);
+      // await newRepetition.setState(async (prev) => {
+      //   return { ...prev, body: await formatText(text) };
+      // });
+      newRepData = await context.getContext(chatId, "newRepetition");
+      // newRepData = await newRepetition.getState();
+      await clearTrash(chatId);
+      await context.setContext(chatId, "isFormated", () => true);
+      // await isFormated.setState(() => true);
       sendMessage(
         `
 📋 Please confirm the details you have provided:
@@ -87,7 +106,8 @@ ${newRepData.body}
           ]),
         }
       );
-      currentAction.setState(() => "checkNewRep");
+      await context.setContext(chatId, "currentAction", () => "checkNewRep");
+      // currentAction.setState(() => "checkNewRep");
       break;
   }
 }
