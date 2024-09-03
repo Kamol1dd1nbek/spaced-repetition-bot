@@ -8,7 +8,7 @@ export default async function sendMessage(msg, chatId, options) {
 
   if (Object.keys(mainMsg).length && !isFormatedtext) {
     try {
-      const editedMsg = await bot.editMessageText(msg + `\n${Math.floor(Math.random() * 101)}`, {
+      const editedMsg = await bot.editMessageText(msg, {
         chat_id: mainMsg.chat.id,
         message_id: mainMsg.message_id,
         ...options,
@@ -19,7 +19,7 @@ export default async function sendMessage(msg, chatId, options) {
       console.log(error.message);
     }
   } else if (Object.keys(mainMsg).length && isFormatedtext) {
-    const sentMessage = await bot.sendMessage(chatId, msg + `\n${Math.floor(Math.random() * 101)}`, {
+    const sentMessage = await bot.sendMessage(chatId, msg, {
       parse_mode: "MarkdownV2",
       ...options,
     });
@@ -30,7 +30,7 @@ export default async function sendMessage(msg, chatId, options) {
     // await isFormated.setState(() => false);
   } else {
     try {
-      const sentMsg = await bot.sendMessage(chatId, msg + `\n${Math.floor(Math.random() * 101)}`, {
+      const sentMsg = await bot.sendMessage(chatId, msg, {
         parse_mode: "MarkdownV2",
         ...options,
       });

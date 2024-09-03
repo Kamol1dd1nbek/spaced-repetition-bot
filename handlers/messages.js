@@ -111,5 +111,5 @@ ${newRepData.body}
       break;
   }
 
-  // await clearTrash(chatId);
+  await clearTrash(chatId);
 }
