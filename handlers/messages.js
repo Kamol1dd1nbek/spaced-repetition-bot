@@ -21,7 +21,6 @@ export default async function onMessage(msg) {
   // ]);
   let newRepData = await context.getContext(chatId, "newRepetition");
   // let newRepData = await newRepetition.getState();
-  
 
   switch (await context.getContext(chatId, "currentAction")) {
     case "addTitle":
@@ -66,8 +65,6 @@ export default async function onMessage(msg) {
         return sendMessage("⚠️ Body cannot be empty", chatId);
       }
       await context.setContext(chatId, "newRepetition", (prevRepetition) => {
-        console.log(prevRepetition);
-        
         return { ...prevRepetition, body: formatText(text) };
       });
       // await newRepetition.setState(async (prev) => {

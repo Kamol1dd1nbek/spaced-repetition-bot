@@ -1,5 +1,4 @@
 import { bot } from "../bot.js";
-import { findUserById } from "../services/userService.js";
 import { context } from "../states/state.js";
 let userStates = new Map();
 
@@ -7,7 +6,6 @@ function createContext() {
   return {
     async getContext(chatId, propName) {
       try {
-        console.log(userStates.has(chatId), chatId, propName);
         if (userStates.has(chatId)) {
           return userStates.get(chatId).get(propName);
         }
@@ -141,7 +139,7 @@ async function clearTrash(chatId) {
   }
 }
 
-function formatText(text) {
+function formatText1(text) {
   text = text
     .replace(/\.c(.*?)\.c/g, "```$1```")
     .replace(/\.b(.*?)\.b/g, "*$1*")
@@ -205,8 +203,50 @@ function formatText(text) {
       escapedText += text[i];
     }
   }
+  console.log(escapedText);
 
   return escapedText;
+}
+
+function formatText(text) {
+  let result = "";
+  let commandsAlpha = ["b", "c", "i", "u", "s"];
+  const markdownChars = [
+    "_",
+    "*",
+    "[",
+    "]",
+    "(",
+    ")",
+    "~",
+    "`",
+    ">",
+    "#",
+    "+",
+    "-",
+    "=",
+    "|",
+    "{",
+    "}",
+    ".",
+    "!",
+    ",",
+  ];
+  for (let i = 0; i < text.length; i++) {
+    if (text[i] == "." && commandsAlpha.includes(text[i + 1])) {
+      result += `.${text[i++ + 1]}`;
+    } else if (markdownChars.includes(text[i])) {
+      result += `\\${text[i]}`;
+    } else {
+      result += text[i];
+    }
+  }
+  return result
+    .replace(/\.c/g, "```")
+    .replace(/\.b/g, "*")
+    .replace(/\.i/g, "_")
+    .replace(/\.u/g, "__")
+    .replace(/\.s/g, "~");
 }
 
 function addTimeStringToDate(initialDate, timeString) {
