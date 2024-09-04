@@ -1,27 +1,83 @@
 import { bot } from "../bot.js";
 import { findUserById } from "../services/userService.js";
-import { context, trash } from "../states/state.js";
+import { context } from "../states/state.js";
+let userStates = new Map();
 
 function createContext() {
   return {
     async getContext(chatId, propName) {
-      // console.log(chatId, "-----cr contex");
-
       try {
-        let user = await findUserById(chatId);
-        // console.log(user, "-----cr contex");
-        if (user && propName in user) return user[propName];
-        else return undefined;
+        console.log(userStates.has(chatId), chatId, propName);
+        if (userStates.has(chatId)) {
+          return userStates.get(chatId).get(propName);
+        }
+        return null;
+        // let user = await findUserById(chatId);
+        // if (user && propName in user) return user[propName];
+        // else return undefined;
       } catch (error) {
         console.log(error.message);
       }
     },
     async setContext(chatId, propName, callback) {
-      let user = await findUserById(chatId);
-      if (user) {
-        user[propName] = await callback(user[propName]);
-        return await user.save();
+      if (!userStates.has(chatId)) {
+        userStates.set(
+          chatId,
+          new Map(
+            Object.entries({
+              id: null,
+              firstName: null,
+              lastName: null,
+              username: null,
+              mainMessage: {},
+              isFormated: false,
+              currentAction: "",
+              isRepetitioning: false,
+              timeoutId: "",
+              newRepetition: {},
+              trash: [],
+              pagination: { currentPage: 1 },
+              createdDate: new Date(),
+            })
+          )
+        );
       }
+      userStates
+        .get(chatId)
+        .set(
+          propName,
+          await callback(userStates.get(chatId).get(propName) || null)
+        );
+
+      // if (!userStates.has(chatId)) {
+      //   userStates.set(
+      //     chatId,
+      //     new Map({
+      //       id: null,
+      //       firstName: null,
+      //       lastName: null,
+      //       username: null,
+      //       mainMessage: {},
+      //       isFormated: false,
+      //       currentAction: "",
+      //       isRepetitioning: false,
+      //       timeoutId: "",
+      //       newRepetition: {},
+      //       trash: [],
+      //       pagination: { currentPage: 1 },
+      //       createdDate: new Date(),
+      //     })
+      //   );
+      // }
+
+      // userStates
+      //   .get(chatId)
+      //   .set(propName, await callback(userStates.get(chatId).get(propName)));
+      // let user = await findUserById(chatId);
+      // if (user) {
+      //   user[propName] = await callback(user[propName]);
+      //   return await user.save();
+      // }
     },
   };
 }

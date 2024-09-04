@@ -1,5 +1,5 @@
 import { bot } from "../bot.js";
-import { context, isFormated, mainMessage } from "../states/state.js";
+import { context } from "../states/state.js";
 
 export default async function sendMessage(msg, chatId, options) {
   const mainMsg = await context.getContext(chatId, "mainMessage");

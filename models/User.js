@@ -13,7 +13,6 @@ const userSchema = new mongoose.Schema({
   newRepetition: { type: Object, default: {} },
   trash: { type: Array, default: [] },
   pagination: { type: Object, default: { currentPage: 1 } },
-  pagination: { type: Object, default: { currentPage: 1 } },
   createdDate: { type: Date, default: Date.now },
 });
 

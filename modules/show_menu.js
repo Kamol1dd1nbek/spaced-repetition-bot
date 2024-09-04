@@ -1,5 +1,5 @@
 import { getOldRepetitions } from "../services/repetitionService.js";
-import { context, isFormated, isRepetitioning } from "../states/state.js";
+import { context } from "../states/state.js";
 import { createInlineKeyboard } from "../utils/helpers.js";
 import answerCallbackQuery from "./answerCallbackQuery.js";
 import sendMessage from "./sendMessage.js";

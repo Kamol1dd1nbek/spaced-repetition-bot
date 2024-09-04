@@ -1,5 +1,5 @@
 import Repetition from "../models/Repetition.js";
-import { context, newRepetition } from "../states/state.js";
+import { context } from "../states/state.js";
 
 async function getRepetitions(page = 1, filter = {}, limit = 10) {
   const currentTime = new Date();

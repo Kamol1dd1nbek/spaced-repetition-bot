@@ -1,9 +1,5 @@
 import {
   context,
-  currentAction,
-  isFormated,
-  newRepetition,
-  pagination,
   repetitionsTimes,
 } from "../states/state.js";
 import {

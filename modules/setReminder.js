@@ -1,9 +1,6 @@
 import { getNextRepetition } from "../services/repetitionService.js";
 import {
   context,
-  isFormated,
-  isRepetitioning,
-  timeoutId,
 } from "../states/state.js";
 import {
   createInlineKeyboard,
