@@ -313,7 +313,7 @@ ${
     : ""
 }
 📜 Body:\n
-${thisRepetition.body}
+||${thisRepetition.body}||
         `,
         chatId,
         {
