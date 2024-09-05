@@ -32,7 +32,7 @@ async function setReminder(chatId) {
         : ""
     }
     📜 Body:\n
-    ${nextRepetition.body}
+    ||${nextRepetition.body}||
             `,
           chatId,
           {
