@@ -1,7 +1,4 @@
-import {
-  context,
-  repetitionsTimes,
-} from "../states/state.js";
+import { context, repetitionsTimes } from "../states/state.js";
 import {
   addTimeStringToDate,
   createInlineKeyboard,
@@ -185,18 +182,25 @@ ${thisRepetition.body}
 
     case data === "show_list":
       paginationData = await context.getContext(chatId, "pagination");
+      // return 1
+
       // paginationData = await pagination.getState();
       oldRepetitions = await getOldRepetitions(
         chatId,
-        paginationData.currentPage
+        paginationData?.currentPage || 1
       );
-      paginationData = await context.setContext(chatId, "pagination", () => {
-        return {
-          currentPage: oldRepetitions.currentPage,
-          totalPages: oldRepetitions.totalPages,
-        };
-      });
-      
+
+      paginationData = await context.setContext(
+        chatId,
+        "pagination",
+        async () => {
+          return {
+            currentPage: oldRepetitions.currentPage,
+            totalPages: oldRepetitions.totalPages,
+          };
+        }
+      );
+
       // paginationData = await pagination.setState(() => {
       //   return {
       //     currentPage: oldRepetitions.currentPage,
@@ -205,6 +209,7 @@ ${thisRepetition.body}
       // });
       await context.setContext(chatId, "isFormated", (user) => true);
       // isFormated.setState(() => true);
+
       sendMessage(
         `
       Complete tasks on time❗️
@@ -227,8 +232,8 @@ ${thisRepetition.body}
               })
             ),
             createPaginationBtns(
-              paginationData.pagination.currentPage,
-              paginationData.pagination.totalPages
+              paginationData?.currentPage || 1,
+              paginationData?.totalPages || 1
             ),
             [{ text: "🔙", callback_data: "get_list" }],
           ]),
@@ -242,12 +247,16 @@ ${thisRepetition.body}
       paginationData = await context.getContext(chatId, "pagination");
       // paginationData = await pagination.getState();
       oldRepetitions = await getOldRepetitions(chatId, page);
-      paginationData = await context.setContext(chatId, "pagination", () => {
-        return {
-          currentPage: page,
-          totalPages: oldRepetitions.totalPages,
-        };
-      });
+      paginationData = await context.setContext(
+        chatId,
+        "pagination",
+        async () => {
+          return {
+            currentPage: page,
+            totalPages: oldRepetitions.totalPages,
+          };
+        }
+      );
       // paginationData = await pagination.setState(() => {
       //   return { currentPage: page, totalPages: oldRepetitions.totalPages };
       // });
@@ -278,6 +287,7 @@ ${thisRepetition.body}
               paginationData.currentPage,
               paginationData.totalPages
             ),
+            [{ text: "🔙", callback_data: "get_list" }],
           ]),
         }
       );

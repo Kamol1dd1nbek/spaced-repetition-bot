@@ -1,4 +1,5 @@
 import { bot } from "../bot.js";
+import { findUserById } from "../services/userService.js";
 import { context } from "../states/state.js";
 let userStates = new Map();
 
@@ -19,6 +20,7 @@ function createContext() {
     },
     async setContext(chatId, propName, callback) {
       if (!userStates.has(chatId)) {
+        const user = await findUserById(chatId);
         userStates.set(
           chatId,
           new Map(
@@ -34,7 +36,7 @@ function createContext() {
               timeoutId: "",
               newRepetition: {},
               trash: [],
-              pagination: { currentPage: 1 },
+              pagination: { currentPage: 1, totalPages: 1 },
               createdDate: new Date(),
             })
           )
@@ -46,6 +48,10 @@ function createContext() {
           propName,
           await callback(userStates.get(chatId).get(propName) || null)
         );
+        // console.log("1", userStates.get(chatId));
+        // console.log("2", userStates.get(chatId).get(propName));
+        
+      return userStates.get(chatId).get(propName);
 
       // if (!userStates.has(chatId)) {
       //   userStates.set(
