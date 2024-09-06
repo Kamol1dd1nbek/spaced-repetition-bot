@@ -28,7 +28,7 @@ export default async function onMessage(msg) {
         return sendMessage("⚠️ Title cannot be empty", chatId);
       }
       await context.setContext(chatId, "newRepetition", (prevRepetition) => {
-        return { ...prevRepetition, title: text, chatId };
+        return { ...prevRepetition, title: formatText(text), chatId };
       });
       // newRepetition.setState((prev) => {
       //   return { ...prev, title: text, chatId };
@@ -45,7 +45,7 @@ export default async function onMessage(msg) {
     case "addSubtitle":
       if (text !== ".") {
         await context.setContext(chatId, "newRepetition", (prevRepetition) => {
-          return { ...prevRepetition, subtitle: text };
+          return { ...prevRepetition, subtitle: formatText(text) };
         });
         // newRepetition.setState((prev) => {
         //   return { ...prev, subtitle: text };
