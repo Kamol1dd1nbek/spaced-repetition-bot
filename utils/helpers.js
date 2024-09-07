@@ -11,9 +11,6 @@ function createContext() {
           return userStates.get(chatId).get(propName);
         }
         return null;
-        // let user = await findUserById(chatId);
-        // if (user && propName in user) return user[propName];
-        // else return undefined;
       } catch (error) {
         console.log(error.message);
       }
@@ -48,40 +45,8 @@ function createContext() {
           propName,
           await callback(userStates.get(chatId).get(propName) || null)
         );
-        // console.log("1", userStates.get(chatId));
-        // console.log("2", userStates.get(chatId).get(propName));
-        
+
       return userStates.get(chatId).get(propName);
-
-      // if (!userStates.has(chatId)) {
-      //   userStates.set(
-      //     chatId,
-      //     new Map({
-      //       id: null,
-      //       firstName: null,
-      //       lastName: null,
-      //       username: null,
-      //       mainMessage: {},
-      //       isFormated: false,
-      //       currentAction: "",
-      //       isRepetitioning: false,
-      //       timeoutId: "",
-      //       newRepetition: {},
-      //       trash: [],
-      //       pagination: { currentPage: 1 },
-      //       createdDate: new Date(),
-      //     })
-      //   );
-      // }
-
-      // userStates
-      //   .get(chatId)
-      //   .set(propName, await callback(userStates.get(chatId).get(propName)));
-      // let user = await findUserById(chatId);
-      // if (user) {
-      //   user[propName] = await callback(user[propName]);
-      //   return await user.save();
-      // }
     },
   };
 }
@@ -131,87 +96,10 @@ async function clearTrash(chatId) {
             msg.message_id !== message.message_id
         )
       );
-
-      // await trash.setState((prev) =>
-      //   prev.filter(
-      //     (msg) =>
-      //       msg.chat_id !== message.chat_id &&
-      //       msg.message_id !== message.message_id
-      //   )
-      // );
     } catch (error) {
       console.log(error.message);
     }
   }
-}
-
-function formatText1(text) {
-  text = text
-    .replace(/\.c(.*?)\.c/g, "```$1```")
-    .replace(/\.b(.*?)\.b/g, "*$1*")
-    .replace(/\.i(.*?)\.i/g, "_$1_")
-    .replace(/\.u(.*?)\.u/g, "__$1__")
-    .replace(/\.s(.*?)\.s/g, "~$1~")
-    .replace(/\.link\((.*?),\s*(.*?)\)/g, "[$2]($1)");
-
-  const markdownChars = [
-    "_",
-    "*",
-    "[",
-    "]",
-    "(",
-    ")",
-    "~",
-    "`",
-    ">",
-    "#",
-    "+",
-    "-",
-    "=",
-    "|",
-    "{",
-    "}",
-    ".",
-    "!",
-    ",",
-  ];
-
-  let escapedText = "";
-  let insideCodeBlock = false;
-  let insideSpecialFormatting = false;
-
-  for (let i = 0; i < text.length; i++) {
-    if (text.slice(i, i + 3) === "```") {
-      insideCodeBlock = !insideCodeBlock;
-      escapedText += text.slice(i, i + 3);
-      i += 2;
-      continue;
-    }
-
-    if (
-      text[i] === "*" ||
-      text[i] === "_" ||
-      text[i] === "`" ||
-      text[i] === "~"
-    ) {
-      insideSpecialFormatting = !insideSpecialFormatting;
-      escapedText += text[i];
-      continue;
-    }
-
-    if (
-      markdownChars.includes(text[i]) &&
-      !insideCodeBlock &&
-      !insideSpecialFormatting
-    ) {
-      escapedText += "\\" + text[i];
-    } else {
-      escapedText += text[i];
-    }
-  }
-  console.log(escapedText);
-
-  return escapedText;
 }
 
 function formatText(text) {

@@ -29,7 +29,7 @@ export default async function onCallbackQuery(callbackQuery) {
   switch (true) {
     case data === "add_new":
       await context.setContext(chatId, "currentAction", (user) => "addTitle");
-      // await currentAction.setState(() => "addTitle");
+      await context.setContext(chatId, "isRepetitioning", () => false);
       await sendMessage("📌 Please enter the TITLE :", chatId, {
         ...createInlineKeyboard([
           [{ text: "Cencel", callback_data: "cencel_adding" }],
@@ -42,7 +42,6 @@ export default async function onCallbackQuery(callbackQuery) {
       await context.setContext(chatId, "newRepetition", (user) => {
         return {};
       });
-      // await newRepetition.setState(() => {});
       await show_menu(queryId, chatId);
       await answerCallbackQuery(queryId, "Cencelled!");
       break;
@@ -50,9 +49,9 @@ export default async function onCallbackQuery(callbackQuery) {
     case data === "confirm_adding":
       try {
         const thisRepetition = await saveRepetition(chatId);
+        await context.setContext(chatId, "isRepetitioning", () => false);
         await answerCallbackQuery(queryId, "💾 Saved!");
         await context.setContext(chatId, "isFormated", () => true);
-        // await isFormated.setState(() => true);
         await sendMessage(
           `
 🧠 Repeat this:
@@ -109,7 +108,6 @@ ${
       await context.setContext(chatId, "newRepetition", (user) => {
         return {};
       });
-      // newRepetition.setState(() => {});
       break;
 
     case data.startsWith("false_"):
@@ -182,9 +180,7 @@ ${
 
     case data === "show_list":
       paginationData = await context.getContext(chatId, "pagination");
-      // return 1
-
-      // paginationData = await pagination.getState();
+      await context.setContext(chatId, "isRepetitioning", () => false);
       oldRepetitions = await getOldRepetitions(
         chatId,
         paginationData?.currentPage || 1
@@ -200,16 +196,7 @@ ${
           };
         }
       );
-
-      // paginationData = await pagination.setState(() => {
-      //   return {
-      //     currentPage: oldRepetitions.currentPage,
-      //     totalPages: oldRepetitions.totalPages,
-      //   };
-      // });
       await context.setContext(chatId, "isFormated", (user) => true);
-      // isFormated.setState(() => true);
-
       sendMessage(
         `
       Complete tasks on time❗️
@@ -245,7 +232,6 @@ ${
     case data.startsWith("page_"):
       let page = data.split("_")[1];
       paginationData = await context.getContext(chatId, "pagination");
-      // paginationData = await pagination.getState();
       oldRepetitions = await getOldRepetitions(chatId, page);
       paginationData = await context.setContext(
         chatId,
@@ -257,11 +243,7 @@ ${
           };
         }
       );
-      // paginationData = await pagination.setState(() => {
-      //   return { currentPage: page, totalPages: oldRepetitions.totalPages };
-      // });
       await context.setContext(chatId, "isFormated", (user) => true);
-      // isFormated.setState(() => true);
       sendMessage(
         `
       Complete tasks on time❗️
@@ -301,7 +283,7 @@ ${
         return answerCallbackQuery(queryId, "Repetition not found!");
       answerCallbackQuery(queryId, "Loading ...");
       await context.setContext(chatId, "isFormated", () => true);
-      // await isFormated.setState(() => true);
+      await context.setContext(chatId, "isRepetitioning", () => false);
       await sendMessage(
         `
 🧠 Repeat this:

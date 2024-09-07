@@ -15,8 +15,7 @@ export const bot = new TelegramBot(config.BOT_TOKEN, { polling: true });
 connectDB(config.CONNECTION);
 
 bot.onText(/\/.*/, (msg) => {
-  // console.log(msg.chat.id);
-  authMiddleware(msg.chat.id, msg, onCommand)
+  authMiddleware(msg.chat.id, msg, onCommand);
 });
 bot.on("message", (msg) => authMiddleware(msg.chat.id, msg, onMessage));
 bot.on("callback_query", (callbackQuery) =>

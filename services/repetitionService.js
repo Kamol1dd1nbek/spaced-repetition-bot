@@ -85,7 +85,6 @@ async function getOldRepetitions(chatId, page = 1, limit = 10) {
 async function saveRepetition(chatId, custom) {
   let repetition = custom;
   if (!custom) repetition = await context.getContext(chatId, "newRepetition");
-  // if (!custom) repetition = await newRepetition.getState();
   const newRepe = await new Repetition({ ...repetition }).save();
   return newRepe;
 }

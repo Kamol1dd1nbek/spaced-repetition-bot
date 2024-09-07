@@ -15,12 +15,7 @@ export default async function onMessage(msg) {
     ...trash,
     { chat_id: chatId, message_id: msg.message_id },
   ]);
-  // await trash.setState((prev) => [
-  //   ...prev,
-  //   { chat_id: msg.chat.id, message_id: msg.message_id },
-  // ]);
   let newRepData = await context.getContext(chatId, "newRepetition");
-  // let newRepData = await newRepetition.getState();
 
   switch (await context.getContext(chatId, "currentAction")) {
     case "addTitle":
@@ -30,16 +25,12 @@ export default async function onMessage(msg) {
       await context.setContext(chatId, "newRepetition", (prevRepetition) => {
         return { ...prevRepetition, title: formatText(text), chatId };
       });
-      // newRepetition.setState((prev) => {
-      //   return { ...prev, title: text, chatId };
-      // });
       sendMessage("🖋️ Please enter the SUBTITLE ", chatId, {
         ...createInlineKeyboard([
           [{ text: "Cencel", callback_data: "cencel_adding" }],
         ]),
       });
       await context.setContext(chatId, "currentAction", () => "addSubtitle");
-      // currentAction.setState(() => "addSubtitle");
       break;
 
     case "addSubtitle":
@@ -47,9 +38,6 @@ export default async function onMessage(msg) {
         await context.setContext(chatId, "newRepetition", (prevRepetition) => {
           return { ...prevRepetition, subtitle: formatText(text) };
         });
-        // newRepetition.setState((prev) => {
-        //   return { ...prev, subtitle: text };
-        // });
       }
       sendMessage("📜 Please enter the BODY :", chatId, {
         ...createInlineKeyboard([
@@ -57,7 +45,6 @@ export default async function onMessage(msg) {
         ]),
       });
       await context.setContext(chatId, "currentAction", () => "addBody");
-      // currentAction.setState(() => "addBody");
       break;
 
     case "addBody":
@@ -67,14 +54,9 @@ export default async function onMessage(msg) {
       await context.setContext(chatId, "newRepetition", (prevRepetition) => {
         return { ...prevRepetition, body: formatText(text) };
       });
-      // await newRepetition.setState(async (prev) => {
-      //   return { ...prev, body: await formatText(text) };
-      // });
       newRepData = await context.getContext(chatId, "newRepetition");
-      // newRepData = await newRepetition.getState();
       await clearTrash(chatId);
       await context.setContext(chatId, "isFormated", () => true);
-      // await isFormated.setState(() => true);
       sendMessage(
         `
 📋 Please confirm the details you have provided:
@@ -104,7 +86,6 @@ ${newRepData.body}
         }
       );
       await context.setContext(chatId, "currentAction", () => "checkNewRep");
-      // currentAction.setState(() => "checkNewRep");
       break;
   }
 

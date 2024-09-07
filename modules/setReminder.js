@@ -1,7 +1,5 @@
 import { getNextRepetition } from "../services/repetitionService.js";
-import {
-  context,
-} from "../states/state.js";
+import { context } from "../states/state.js";
 import {
   createInlineKeyboard,
   getTimeDifferenceInMilliseconds,
@@ -10,7 +8,6 @@ import sendMessage from "./sendMessage.js";
 
 async function setReminder(chatId) {
   let tId = await context.getContext(chatId, "timeoutId");
-  // let tId = await timeoutId.getState();
   if (tId) clearInterval(tId);
   const nextRepetition = await getNextRepetition(chatId);
 
@@ -18,9 +15,7 @@ async function setReminder(chatId) {
     tId = setTimeout(async () => {
       if (!(await context.getContext(chatId, "isRepetitioning"))) {
         await context.setContext(chatId, "isFormated", () => true);
-        // await isFormated.setState(() => true);
         await context.setContext(chatId, "isRepetitioning", () => true);
-        // isRepetitioning.setState(() => true);
         await sendMessage(
           `
     🧠 Repeat this:
@@ -69,7 +64,6 @@ async function setReminder(chatId) {
     }, getTimeDifferenceInMilliseconds(new Date(), nextRepetition.nextRepetition));
 
     await context.setContext(chatId, "timeoutId", () => tId);
-    // timeoutId.setState(() => tId);
   }
 }
 

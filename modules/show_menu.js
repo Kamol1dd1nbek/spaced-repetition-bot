@@ -6,11 +6,8 @@ import sendMessage from "./sendMessage.js";
 
 async function show_menu(queryId, chatId) {
   await context.setContext(chatId, "isRepetitioning", () => false);
-  // isRepetitioning.setState(() => false);
   const oldRepetitions = await getOldRepetitions(chatId);
-
   await context.setContext(chatId, "isFormated", () => true);
-  // isFormated.setState(() => true);
 
   let msg_text = "";
   if (oldRepetitions?.totalCount > 0)
