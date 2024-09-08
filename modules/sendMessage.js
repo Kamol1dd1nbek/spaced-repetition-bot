@@ -5,7 +5,7 @@ export default async function sendMessage(msg, chatId, options) {
   const mainMsg = await context.getContext(chatId, "mainMessage");
   const isFormatedtext = await context.getContext(chatId, "isFormated");
 
-  if (Object.keys(mainMsg).length && !isFormatedtext) {
+  if (Object.keys(mainMsg ? mainMsg : {}).length && !isFormatedtext) {
     try {
       const editedMsg = await bot.editMessageText(msg, {
         chat_id: mainMsg.chat.id,
@@ -16,7 +16,7 @@ export default async function sendMessage(msg, chatId, options) {
     } catch (error) {
       console.log(error.message);
     }
-  } else if (Object.keys(mainMsg).length && isFormatedtext) {
+  } else if (Object.keys(mainMsg ? mainMsg : {}).length && isFormatedtext) {
     const sentMessage = await bot.sendMessage(chatId, msg, {
       parse_mode: "MarkdownV2",
       ...options,
