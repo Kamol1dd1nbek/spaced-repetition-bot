@@ -14,6 +14,7 @@ import {
   saveRepetition,
 } from "../services/repetitionService.js";
 import show_menu from "../modules/show_menu.js";
+import t from "../langs/index.js";
 
 export default async function onCallbackQuery(callbackQuery) {
   const data = callbackQuery.data;
@@ -30,39 +31,51 @@ export default async function onCallbackQuery(callbackQuery) {
     case data === "add_new":
       await context.setContext(chatId, "currentAction", (user) => "addTitle");
       await context.setContext(chatId, "isRepetitioning", () => false);
-      await sendMessage("📌 Please enter the TITLE :", chatId, {
-        ...createInlineKeyboard([
-          [{ text: "Cencel", callback_data: "cencel_adding" }],
-        ]),
-      });
-      await answerCallbackQuery(queryId, "Enter repetitions data");
+      await sendMessage(
+        `📌 ${await t("Please enter the TITLE", chatId)}`,
+        chatId,
+        {
+          ...createInlineKeyboard([
+            [
+              {
+                text: await t("Cancel", chatId),
+                callback_data: "cencel_adding",
+              },
+            ],
+          ]),
+        }
+      );
+      await answerCallbackQuery(
+        queryId,
+        await t("Enter repetitions data", chatId)
+      );
       break;
 
     case data === "cencel_adding":
       await context.setContext(chatId, "newRepetition", (user) => {
         return {};
       });
+      await answerCallbackQuery(queryId, `${await t("Canceled", chatId)}!`);
       await show_menu(queryId, chatId);
-      await answerCallbackQuery(queryId, "Cencelled!");
       break;
 
     case data === "confirm_adding":
       try {
         const thisRepetition = await saveRepetition(chatId);
         await context.setContext(chatId, "isRepetitioning", () => false);
-        await answerCallbackQuery(queryId, "💾 Saved!");
+        await answerCallbackQuery(queryId, `💾 ${await t("Saved", chatId)}`);
         await context.setContext(chatId, "isFormated", () => true);
         await sendMessage(
           `
-🧠 Repeat this:
+🧠 ${await t("Repeat this", chatId)}:
           
-📌 Title: *${thisRepetition.title}*
+📌 ${await t("Title", chatId)}: *${thisRepetition.title}*
 ${
   thisRepetition.subtitle !== undefined
-    ? `\n🖋️ Subtitle: ${thisRepetition.subtitle}\n`
+    ? `\n🖋️ ${await t("Subtitle", chatId)}: ${thisRepetition.subtitle}\n`
     : ""
 }
-📜 Body:\n
+📜 ${await t("Body", chatId)}:\n
 ||${thisRepetition.body}||
           `,
           chatId,
@@ -70,25 +83,25 @@ ${
             ...createInlineKeyboard([
               [
                 {
-                  text: "❌ False",
+                  text: `❌ ${await t("False", chatId)}`,
                   callback_data: `false_${thisRepetition._id}`,
                 },
                 {
-                  text: "✅ True",
+                  text: `✅ ${await t("True", chatId)}`,
                   callback_data: `true_${thisRepetition._id}`,
                 },
               ],
               [
                 {
-                  text: "🔄 Again",
+                  text: `🔄 ${await t("Again", chatId)}`,
                   callback_data: `again_${thisRepetition._id}`,
                 },
                 {
-                  text: "😎 Easy",
+                  text: `😎 ${await t("Easy", chatId)}`,
                   callback_data: `easy_${thisRepetition._id}`,
                 },
                 {
-                  text: "📋 Others",
+                  text: `📋 ${await t("Others", chatId)}`,
                   callback_data: `get_list`,
                 },
               ],
@@ -101,7 +114,7 @@ ${
           error.message
         );
         await bot.answerCallbackQuery(callbackQuery.id, {
-          text: "Something went wrong!",
+          text: `${await t("Something went wrong", chatId)}!`,
           show_alert: true,
         });
       }
@@ -154,7 +167,10 @@ ${
       repetition.nextRepetition = nextRepetitionDate;
       await repetition.save();
       await show_menu(queryId, chatId);
-      await answerCallbackQuery(queryId, "Reminder after 10 minutes");
+      await answerCallbackQuery(
+        queryId,
+        "You will receive a reminder in 10 minutes"
+      );
       break;
 
     case data.startsWith("easy_"):
@@ -199,7 +215,7 @@ ${
       await context.setContext(chatId, "isFormated", (user) => true);
       sendMessage(
         `
-      Complete tasks on time❗️
+      ${await t("Complate tasks on time", chatId)}❗️
       ${oldRepetitions.data.map(
         (rep, index) =>
           `\n${index + 1}\\. *${rep.title}*${
@@ -286,15 +302,15 @@ ${
       await context.setContext(chatId, "isRepetitioning", () => false);
       await sendMessage(
         `
-🧠 Repeat this:
+🧠 ${await t("Repeat this", chatId)}:
         
-📌 Title: *${thisRepetition.title}*
+📌 ${await t("Title", chatId)}: *${thisRepetition.title}*
 ${
   thisRepetition.subtitle !== undefined
-    ? `\n🖋️ Subtitle: ${thisRepetition.subtitle}\n`
+    ? `\n🖋️ ${await t("Subtitle", chatId)}: ${thisRepetition.subtitle}\n`
     : ""
 }
-📜 Body:\n
+📜 ${await t("Body", chatId)}:\n
 ||${thisRepetition.body}||
         `,
         chatId,
@@ -302,25 +318,25 @@ ${
           ...createInlineKeyboard([
             [
               {
-                text: "❌ False",
+                text: `❌ ${await t("False", chatId)}`,
                 callback_data: `false_${thisRepetition._id}`,
               },
               {
-                text: "✅ True",
+                text: `✅ ${await t("True", chatId)}`,
                 callback_data: `true_${thisRepetition._id}`,
               },
             ],
             [
               {
-                text: "🔄 Again",
+                text: `🔄 ${await t("Again", chatId)}`,
                 callback_data: `again_${thisRepetition._id}`,
               },
               {
-                text: "😎 Easy",
+                text: `😎 ${await t("Easy", chatId)}`,
                 callback_data: `easy_${thisRepetition._id}`,
               },
               {
-                text: "📋 Others",
+                text: `📋 ${await t("Others", chatId)}`,
                 callback_data: `get_list`,
               },
             ],
@@ -328,6 +344,19 @@ ${
         }
       );
 
+      break;
+
+    case data.startsWith("lang_"):
+      let lang = data.split("_")[1];
+
+      await context.setContext(chatId, "currentLang", () => lang);
+      await answerCallbackQuery(
+        queryId,
+        await t("Successfully updated", chatId)
+      );
+      await show_menu(queryId, chatId);
+
+      t("True", chatId);
       break;
 
     case data === "noop":

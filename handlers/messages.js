@@ -1,3 +1,4 @@
+import t from "../langs/index.js";
 import sendMessage from "../modules/sendMessage.js";
 import { context } from "../states/state.js";
 import {
@@ -25,11 +26,20 @@ export default async function onMessage(msg) {
       await context.setContext(chatId, "newRepetition", (prevRepetition) => {
         return { ...prevRepetition, title: formatText(text), chatId };
       });
-      sendMessage("🖋️ Please enter the SUBTITLE ", chatId, {
-        ...createInlineKeyboard([
-          [{ text: "Cencel", callback_data: "cencel_adding" }],
-        ]),
-      });
+      sendMessage(
+        `🖋️ ${await t("Please enter the SUBTITLE", chatId)}`,
+        chatId,
+        {
+          ...createInlineKeyboard([
+            [
+              {
+                text: `${await t("Cancel", chatId)}`,
+                callback_data: "cencel_adding",
+              },
+            ],
+          ]),
+        }
+      );
       await context.setContext(chatId, "currentAction", () => "addSubtitle");
       break;
 
@@ -39,9 +49,14 @@ export default async function onMessage(msg) {
           return { ...prevRepetition, subtitle: formatText(text) };
         });
       }
-      sendMessage("📜 Please enter the BODY :", chatId, {
+      sendMessage(`📜 ${await t("Please enter the BODY", chatId)}:`, chatId, {
         ...createInlineKeyboard([
-          [{ text: "Cencel", callback_data: "cencel_adding" }],
+          [
+            {
+              text: `${await t("Cancel", chatId)}`,
+              callback_data: "cencel_adding",
+            },
+          ],
         ]),
       });
       await context.setContext(chatId, "currentAction", () => "addBody");
@@ -59,15 +74,15 @@ export default async function onMessage(msg) {
       await context.setContext(chatId, "isFormated", () => true);
       sendMessage(
         `
-📋 Please confirm the details you have provided:
+📋 ${await t("Please confirm the details you have provided", chatId)}:
 
-📌 Title: *${newRepData.title}*
+📌 ${await t("Title", chatId)}: *${newRepData.title}*
 ${
   newRepData.subtitle !== undefined
-    ? `\n🖋️ Subtitle: ${newRepData.subtitle}\n`
+    ? `\n🖋️ ${await t("Subtitle", chatId)}: ${newRepData.subtitle}\n`
     : ""
 }
-📜 Body:\n
+📜 ${await t("Body", chatId)}:\n
 ${newRepData.body}
 `,
         chatId,
@@ -75,12 +90,18 @@ ${newRepData.body}
           ...createKeyboard([["Add"]]),
           ...createInlineKeyboard([
             [
-              { text: "❌ Cencel", callback_data: "cencel_adding" },
               {
-                text: "✏️ Edit",
+                text: `❌ ${await t("Cancel", chatId)}`,
+                callback_data: "cencel_adding",
+              },
+              {
+                text: `✏️ ${await t("Edit", chatId)}`,
                 web_app: { url: "https://github.com/Kamol1dd1nbek" },
               },
-              { text: "✅ Confirm", callback_data: "confirm_adding" },
+              {
+                text: `✅ ${await t("Confirm", chatId)}`,
+                callback_data: "confirm_adding",
+              },
             ],
           ]),
         }

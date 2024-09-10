@@ -1,4 +1,5 @@
 import config from "../environment/config.js";
+import t from "../langs/index.js";
 import setReminder from "./setReminder.js";
 
 function isAuthorized(chatId) {

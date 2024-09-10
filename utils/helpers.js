@@ -35,6 +35,7 @@ function createContext() {
               trash: [],
               pagination: { currentPage: 1, totalPages: 1 },
               createdDate: new Date(),
+              currentLang: "en"
             })
           )
         );

@@ -1,3 +1,4 @@
+import t from "../langs/index.js";
 import User from "../models/User.js";
 import sendMessage from "../modules/sendMessage.js";
 import { findUserById } from "../services/userService.js";
@@ -18,17 +19,17 @@ export default async function onCommand(msg) {
           lastName: msg.chat?.last_name,
           username: msg.chat?.username,
         }).save();
-      }
+      } 
       await context.setContext(chatId, "isFormated", () => true);
 
       sendMessage(
-        `Welcome ${msg.chat.first_name} 🎉\nDont stop learning ✊`,
+        `${await t("Welcome", chatId)} ${msg.chat.first_name} 🎉\n${await t("Don't stop learning", chatId)} ✊`,
         msg.chat.id,
         {
           ...createInlineKeyboard([
             [
               {
-                text: "Continue",
+                text: await t("Continue", chatId),
                 callback_data: "get_list",
               },
             ],
@@ -63,6 +64,31 @@ Text formatting guide:
           ],
         ]),
       });
+      break;
+
+    case "/settings":
+      sendMessage("Select a language", chatId, {
+        ...createInlineKeyboard([
+          [
+            {
+              text: "🇺🇿 O'zbek",
+              callback_data: "lang_uz",
+            },
+          ],
+          [
+            {
+              text: "🇺🇸 English",
+              callback_data: "lang_en",
+            },
+          ],
+          [
+            {
+              text: "🇷🇺 Русский",
+              callback_data: "lang_ru",
+            },
+          ],
+        ]),
+      })
       break;
   }
 }
