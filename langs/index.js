@@ -1,10 +1,12 @@
 import { context } from "../states/state.js";
 import uz from "./uz.json" assert { type: "json" };
 import en from "./en.json" assert { type: "json" };
+import ru from "./ru.json" assert { type: "json" };
 
 let resources = {
   uz,
   en,
+  ru,
 };
 
 async function t(key, chatId) {
