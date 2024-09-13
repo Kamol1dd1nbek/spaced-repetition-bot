@@ -23,6 +23,7 @@ export default async function onMessage(msg) {
       if (text.trim() === "") {
         return sendMessage("⚠️ Title cannot be empty", chatId);
       }
+      await context.setContext(chatId, "isRepetitioning", () => true);
       await context.setContext(chatId, "newRepetition", (prevRepetition) => {
         return { ...prevRepetition, title: formatText(text), chatId };
       });
