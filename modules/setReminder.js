@@ -18,17 +18,16 @@ async function setReminder(chatId) {
         await context.setContext(chatId, "isRepetitioning", () => true);
         await sendMessage(
           `
-    🧠 Repeat this:
-            
-    📌 Title: *${nextRepetition.title}*
-    ${
-      nextRepetition.subtitle !== undefined
-        ? `\n🖋️ Subtitle: ${nextRepetition.subtitle}\n`
-        : ""
-    }
-    📜 Body:\n
-    ||${nextRepetition.body}||
-            `,
+🧠 Repeat this:
+          
+📌 Title: *${nextRepetition.title}*
+${nextRepetition.subtitle !== undefined
+            ? `\n🖋️ Subtitle: ${nextRepetition.subtitle}\n`
+            : ""
+          }
+📜 Body:\n
+||${nextRepetition.body}||
+`,
           chatId,
           {
             ...createInlineKeyboard([

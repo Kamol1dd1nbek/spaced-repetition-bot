@@ -171,10 +171,12 @@ function addTimeStringToDate(initialDate, timeString) {
 }
 
 function createPaginationBtns(currentPage, totalPages) {
+  console.log(currentPage, totalPages);
+  
   return [
     {
       text: "⬅️",
-      callback_data: `page_${currentPage - 1 > 0 ? currentPage - 1 : 1}`,
+      callback_data: currentPage - 1 > 0 ? `page_${currentPage - 1}` : "noop",
     },
     {
       text: `${currentPage}/${totalPages}`,
@@ -182,9 +184,7 @@ function createPaginationBtns(currentPage, totalPages) {
     },
     {
       text: "➡️",
-      callback_data: `page_${
-        currentPage + 1 <= totalPages ? currentPage + 1 : totalPages
-      }`,
+      callback_data: currentPage + 1 <= totalPages ? `page_${currentPage + 1}` : "noop"
     },
   ];
 }
