@@ -36,5 +36,9 @@
   "You have no rehearsals to repeat": "Takrorlanishlar mavjud emas",
   "Please enter the TITLE": "Iltimos, MAVZU ni kiriting",
   "Please enter the SUBTITLE": "Iltimos, IZOH ni kiriting",
-  "Please enter the BODY": "Iltimos, ASOSIY MA'LUMOT ni kiriting"
+  "Please enter the BODY": "Iltimos, ASOSIY MA'LUMOT ni kiriting",
+  "Sorry, the data type you submitted is not currently supported": "Kechirasiz, siz yuborgan maʼlumotlar turi hozirda qoʻllab-quvvatlanmaydi",
+  "Yes": "Ha",
+  "No": "Yo'q",
+  "Do you want to add ✍️ additional text ? 😊": "Qo'shimcha matn ✍️ qo'shmoqchimisiz? 😊"
 }
