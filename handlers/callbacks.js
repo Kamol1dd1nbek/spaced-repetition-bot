@@ -70,10 +70,11 @@ export default async function onCallbackQuery(callbackQuery) {
 🧠 ${await t("Repeat this", chatId)}:
           
 📌 ${await t("Title", chatId)}: *${thisRepetition.title}*
-${thisRepetition.subtitle !== undefined
-            ? `\n🖋️ ${await t("Subtitle", chatId)}: ${thisRepetition.subtitle}\n`
-            : ""
-          }
+${
+  thisRepetition.subtitle !== undefined
+    ? `\n🖋️ ${await t("Subtitle", chatId)}: ${thisRepetition.subtitle}\n`
+    : ""
+}
 📜 ${await t("Body", chatId)}:\n
 ||${thisRepetition.body}||
           `,
@@ -160,7 +161,10 @@ ${thisRepetition.subtitle !== undefined
       repetitionId = data.split("_")[1];
       repetition = await findRepetitionById(repetitionId, chatId);
       if (!repetition)
-        return answerCallbackQuery(queryId, await t("Repetition not found", chatId));
+        return answerCallbackQuery(
+          queryId,
+          await t("Repetition not found", chatId)
+        );
       timesList = await repetitionsTimes.getState();
       nextRepetitionDate = addTimeStringToDate(new Date(), timesList[0]);
       repetition.nextRepetition = nextRepetitionDate;
@@ -190,7 +194,9 @@ ${thisRepetition.subtitle !== undefined
       break;
 
     case data === "get_list":
-      await context.setContext(chatId, "pagination", () => { return { currentPage: 1 } })
+      await context.setContext(chatId, "pagination", () => {
+        return { currentPage: 1 };
+      });
       await show_menu(queryId, chatId);
       break;
 
@@ -217,10 +223,11 @@ ${thisRepetition.subtitle !== undefined
         `
       ${await t("Complate tasks on time", chatId)}❗️
       ${oldRepetitions.data.map(
-          (rep, index) =>
-            `\n${index + 1}\\. *${rep.title}*${rep?.subtitle ? `\n\\- ${rep.subtitle}` : ""
-            }`
-        )}
+        (rep, index) =>
+          `\n${index + 1}\\. *${rep.title}*${
+            rep?.subtitle ? `\n\\- ${rep.subtitle}` : ""
+          }`
+      )}
       `,
         chatId,
         {
@@ -246,7 +253,7 @@ ${thisRepetition.subtitle !== undefined
 
     case data.startsWith("page_"):
       let page = data.split("_")[1];
-      
+
       paginationData = await context.getContext(chatId, "pagination");
       oldRepetitions = await getOldRepetitions(chatId, page);
       paginationData = await context.setContext(
@@ -254,7 +261,7 @@ ${thisRepetition.subtitle !== undefined
         "pagination",
         async () => {
           return {
-            currentPage: page*1,
+            currentPage: page * 1,
             totalPages: oldRepetitions.totalPages,
           };
         }
@@ -264,10 +271,11 @@ ${thisRepetition.subtitle !== undefined
         `
       Complete tasks on time❗️
       ${oldRepetitions.data.map(
-          (rep, index) =>
-            `\n${index + 1}\\. *${rep.title}*${rep?.subtitle ? `\n\\- ${rep.subtitle}` : ""
-            }`
-        )}
+        (rep, index) =>
+          `\n${index + 1}\\. *${rep.title}*${
+            rep?.subtitle ? `\n\\- ${rep.subtitle}` : ""
+          }`
+      )}
       `,
         chatId,
         {
@@ -292,22 +300,23 @@ ${thisRepetition.subtitle !== undefined
       break;
 
     case data.startsWith("repe_"):
+      await context.setContext(chatId, "isRepetitioning", () => true);
       repetitionId = data.split("_")[1];
       let thisRepetition = await findRepetitionById(repetitionId, chatId);
       if (!thisRepetition)
         return answerCallbackQuery(queryId, "Repetition not found!");
       answerCallbackQuery(queryId, "Loading ...");
       await context.setContext(chatId, "isFormated", () => true);
-      await context.setContext(chatId, "isRepetitioning", () => false);
       await sendMessage(
         `
 🧠 ${await t("Repeat this", chatId)}:
         
 📌 ${await t("Title", chatId)}: *${thisRepetition.title}*
-${thisRepetition.subtitle !== undefined
-          ? `\n🖋️ ${await t("Subtitle", chatId)}: ${thisRepetition.subtitle}\n`
-          : ""
-        }
+${
+  thisRepetition.subtitle !== undefined
+    ? `\n🖋️ ${await t("Subtitle", chatId)}: ${thisRepetition.subtitle}\n`
+    : ""
+}
 📜 ${await t("Body", chatId)}:\n
 ||${thisRepetition.body}||
         `,
@@ -359,7 +368,7 @@ ${thisRepetition.subtitle !== undefined
 
     case data === "noop":
       console.log(queryId);
-      
+
       await answerCallbackQuery(queryId, "");
       break;
   }
