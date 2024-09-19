@@ -153,7 +153,9 @@ export default async function onMessage(msg) {
             ]),
           }
         );
-      } send Message funksiyasini to'g'irlab, qayta ko'rib chiqish kerak, unga type va fil eid ham berib yuborish kerak, caption bor yoki yo'q ekanligni ham tekshirish kerak
+      }
+
+      // call back datani qayta ishlash kerak agar reject qilsa boshqa action confirm qilsa boshqa action
 
       //       if (text.trim() === "") {
       //         return sendMessage("⚠️ Body cannot be empty", chatId);
