@@ -128,7 +128,7 @@ ${
       repetition = await findRepetitionById(repetitionId, chatId);
       if (!repetition)
         return answerCallbackQuery(queryId, "Repetition not found");
-      repetition.step = 1;
+      repetition.step = 2;
       timesList = await repetitionsTimes.getState();
       nextRepetitionDate = addTimeStringToDate(
         new Date(),
