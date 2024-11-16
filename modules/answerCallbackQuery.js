@@ -3,7 +3,7 @@ import { bot } from "../bot.js";
 export default async function answerCallbackQuery(
   queryId,
   text,
-  showAlert = false
+  showAlert = false,
 ) {
   try {
     await bot.answerCallbackQuery(queryId, {

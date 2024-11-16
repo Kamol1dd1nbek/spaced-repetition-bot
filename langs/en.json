@@ -12,6 +12,7 @@
   "Title": "Title",
   "Subtitle": "Subtitle",
   "Body": "Body",
+  "Body text": "Body text",
   "Enter": "Enter",
   "Please": "Please",
   "Please confirm the details you have provided": "Please confirm the details you have provided",
@@ -36,5 +37,11 @@
   "You have no rehearsals to repeat": "You have no rehearsals to repeat",
   "Please enter the TITLE": "Please enter the TITLE",
   "Please enter the SUBTITLE": "Please enter the SUBTITLE",
-  "Please enter the BODY": "Please enter the BODY"
+  "Please enter the BODY": "Please enter the BODY",
+  "Sorry, the data type you submitted is not currently supported": "Sorry, the data type you submitted is not currently supported",
+  "Yes": "Yes",
+  "No": "No",
+  "Do you want to add ✍️ additional text ? 😊": "Do you want to add ✍️ additional text ? 😊",
+  "Please enter text": "Please enter text",
+  "Enter additional text for BODY ⌨️": "Enter additional text for BODY ⌨️"
 }

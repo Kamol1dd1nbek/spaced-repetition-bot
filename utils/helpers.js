@@ -35,16 +35,16 @@ function createContext() {
               trash: [],
               pagination: { currentPage: 1, totalPages: 1 },
               createdDate: new Date(),
-              currentLang: "en"
-            })
-          )
+              currentLang: "en",
+            }),
+          ),
         );
       }
       userStates
         .get(chatId)
         .set(
           propName,
-          await callback(userStates.get(chatId).get(propName) || null)
+          await callback(userStates.get(chatId).get(propName) || null),
         );
 
       return userStates.get(chatId).get(propName);
@@ -84,22 +84,26 @@ function createInlineKeyboard(buttons) {
   };
 }
 
-async function clearTrash(chatId) {
-  const trash = await context.getContext(chatId, "trash");
-  if (!trash) return;
-  for (let message of trash) {
-    try {
-      await bot.deleteMessage(message.chat_id, message.message_id);
-      await context.setContext(chatId, "trash", (trash) =>
-        trash.filter(
-          (msg) =>
-            msg.chat_id !== message.chat_id &&
-            msg.message_id !== message.message_id
-        )
-      );
-    } catch (error) {
-      console.log(error.message);
+async function clearTrash(chatId, msgId) {
+  if (!msgId) {
+    const trash = await context.getContext(chatId, "trash");
+    if (!trash) return;
+    for (let message of trash) {
+      try {
+        await bot.deleteMessage(message.chat_id, message.message_id);
+        await context.setContext(chatId, "trash", (trash) =>
+          trash.filter(
+            (msg) =>
+              msg.chat_id !== message.chat_id &&
+              msg.message_id !== message.message_id,
+          ),
+        );
+      } catch (error) {
+        console.log(error.message);
+      }
     }
+  } else {
+    await bot.deleteMessage(chatId, msgId);
   }
 }
 
@@ -171,8 +175,6 @@ function addTimeStringToDate(initialDate, timeString) {
 }
 
 function createPaginationBtns(currentPage, totalPages) {
-  console.log(currentPage, totalPages);
-  
   return [
     {
       text: "⬅️",
@@ -184,7 +186,8 @@ function createPaginationBtns(currentPage, totalPages) {
     },
     {
       text: "➡️",
-      callback_data: currentPage + 1 <= totalPages ? `page_${currentPage + 1}` : "noop"
+      callback_data:
+        currentPage + 1 <= totalPages ? `page_${currentPage + 1}` : "noop",
     },
   ];
 }

@@ -19,10 +19,10 @@ bot.onText(/\/.*/, (msg) => {
 });
 bot.on("message", (msg) => authMiddleware(msg.chat.id, msg, onMessage));
 bot.on("callback_query", (callbackQuery) =>
-  authMiddleware(callbackQuery.message.chat.id, callbackQuery, onCallbackQuery)
+  authMiddleware(callbackQuery.message.chat.id, callbackQuery, onCallbackQuery),
 );
 bot.on("edited_message", (editedMessage) =>
-  authMiddleware(editedMessage.chat.id, editedMessage, onEditMessage)
+  authMiddleware(editedMessage.chat.id, editedMessage, onEditMessage),
 );
 bot.on("polling_error", (error) => {
   console.log(`Polling error: ${error.message}`);
