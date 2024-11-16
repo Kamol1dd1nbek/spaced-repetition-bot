@@ -178,7 +178,7 @@ ${
       repetition = await findRepetitionById(repetitionId, chatId);
       if (!repetition)
         return answerCallbackQuery(queryId, "Repetition not found");
-      repetition.step = 1;
+      repetition.step = 2;
       timesList = await repetitionsTimes.getState();
       nextRepetitionDate = addTimeStringToDate(
         new Date(),
@@ -350,13 +350,13 @@ ${
       break;
 
     case data.startsWith("repe_"):
+      await context.setContext(chatId, "isRepetitioning", () => true);
       repetitionId = data.split("_")[1];
       let thisRepetition = await findRepetitionById(repetitionId, chatId);
       if (!thisRepetition)
         return answerCallbackQuery(queryId, "Repetition not found!");
       answerCallbackQuery(queryId, "Loading ...");
       await context.setContext(chatId, "isFormated", () => true);
-      await context.setContext(chatId, "isRepetitioning", () => false);
       await sendMessage(
         `
 🧠 ${await t("Repeat this", chatId)}:
