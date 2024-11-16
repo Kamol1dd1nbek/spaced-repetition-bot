@@ -1,38 +1,47 @@
-import { bot } from "../bot.js";
 import { context } from "../states/state.js";
+import { bot } from "../bot.js";
 
-export default async function sendMediaMessage(mediaId, chatId, text, options) {
+export default async function sendMediaMessage(
+  chatId,
+  repetition,
+  options,
+  caption,
+) {
   const mainMsg = await context.getContext(chatId, "mainMessage");
-  const isFormatedtext = await context.getContext(chatId, "isFormated");
 
-  if (Object.keys(mainMsg ? mainMsg : {}).length && !isFormatedtext) {
-    try {
-      const editedMsg = await bot.editMessageText(msg, {
-        chat_id: mainMsg.chat.id,
-        message_id: mainMsg.message_id,
-        ...options,
-      });
-      await context.setContext(chatId, "mainMessage", () => editedMsg);
-    } catch (error) {
-      console.log(error.message);
+  try {
+    if (Object.keys(mainMsg ? mainMsg : {}).length) {
+      try {
+        await bot.deleteMessage(chatId, mainMsg.message_id);
+      } catch (error) {
+        console.log(
+          "On deleting main message at sendMediaMessage.js line:18",
+          error.message,
+        );
+      }
     }
-  } else if (Object.keys(mainMsg ? mainMsg : {}).length && isFormatedtext) {
-    const sentMessage = await bot.sendMessage(chatId, msg, {
-      parse_mode: "MarkdownV2",
-      ...options,
-    });
-    await bot.deleteMessage(chatId, mainMsg.message_id);
-    await context.setContext(chatId, "mainMessage", () => sentMessage);
-    await context.setContext(chatId, "isFormated", () => false);
-  } else {
-    try {
-      const sentMsg = await bot.sendMessage(chatId, msg, {
+
+    const sendFunction = {
+      photo: bot.sendPhoto,
+      video: bot.sendVideo,
+      voice: bot.sendVoice,
+      document: bot.sendDocument,
+    }[repetition.type];
+
+    if (!sendFunction) throw new Error("Wrong media type!");
+
+    const sentMessage = await sendFunction.call(
+      bot,
+      chatId,
+      repetition.fileId,
+      {
         parse_mode: "MarkdownV2",
+        caption,
         ...options,
-      });
-      await context.setContext(chatId, "mainMessage", () => sentMsg);
-    } catch (error) {
-      console.log(error.message);
-    }
+      },
+    );
+    await context.setContext(chatId, "mainMessage", () => sentMessage);
+  } catch (error) {
+    console.log("On sendMediaMessage.js line:45 -->", error.message);
   }
 }

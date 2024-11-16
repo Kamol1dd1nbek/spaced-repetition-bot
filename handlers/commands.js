@@ -19,7 +19,7 @@ export default async function onCommand(msg) {
           lastName: msg.chat?.last_name,
           username: msg.chat?.username,
         }).save();
-      } 
+      }
       await context.setContext(chatId, "isFormated", () => true);
 
       sendMessage(
@@ -34,7 +34,7 @@ export default async function onCommand(msg) {
               },
             ],
           ]),
-        }
+        },
       );
       break;
 
@@ -88,7 +88,7 @@ Text formatting guide:
             },
           ],
         ]),
-      })
+      });
       break;
   }
 }

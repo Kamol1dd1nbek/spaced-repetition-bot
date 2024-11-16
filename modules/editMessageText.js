@@ -4,11 +4,11 @@ export default async function editMessageText(
   chatId,
   messageId,
   text,
-  replyMarkup
+  replyMarkup,
 ) {
   bot.editMessageText(text, {
     chat_id: chatId,
     message_id: messageId,
-    ...(replyMarkup && { reply_markup: replyMarkup })
+    ...(replyMarkup && { reply_markup: replyMarkup }),
   });
 }

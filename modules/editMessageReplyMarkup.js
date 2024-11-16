@@ -3,7 +3,7 @@ import { bot } from "../bot.js";
 export default async function editMessageReplyMarkup(
   inlineKeyboards,
   chatId,
-  messageId
+  messageId,
 ) {
   await bot.editMessageReplyMarkup(inlineKeyboards, {
     chat_id: chatId,

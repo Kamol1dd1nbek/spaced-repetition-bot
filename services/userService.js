@@ -8,6 +8,4 @@ async function findUserById(id) {
   }
 }
 
-export {
-  findUserById
-}
+export { findUserById };

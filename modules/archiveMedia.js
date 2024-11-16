@@ -9,6 +9,10 @@ async function archiveMedia(fileId, type) {
     archId = (await bot.sendPhoto(chatId, fileId)).photo[1].file_id;
   } else if (type === "voice") {
     archId = (await bot.sendVoice(chatId, fileId)).voice.file_id;
+  } else if (type === "video") {
+    archId = (await bot.sendVideo(chatId, fileId)).video.file_id;
+  } else if (type === "document") {
+    archId = (await bot.sendDocument(chatId, fileId)).document.file_id;
   }
 
   return archId;

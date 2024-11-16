@@ -7,12 +7,11 @@ function isAuthorized(chatId) {
 }
 
 export default function authMiddleware(chatId, msg, callback) {
-  setReminder(chatId);
-  
   if (!isAuthorized(chatId)) {
     // action on no access
     return 1;
   }
 
+  setReminder(chatId);
   callback(msg);
 }

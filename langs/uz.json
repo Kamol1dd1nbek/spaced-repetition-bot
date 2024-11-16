@@ -12,6 +12,7 @@
   "Title": "Mavzu",
   "Subtitle": "Izoh",
   "Body": "Asosiy ma'lumot",
+  "Body text": "Asosiy ma'lumot matni",
   "Enter": "Kiriting",
   "Please": "Iltimos",
   "Please confirm the details you have provided": "Iltimos, taqdim etilgan ma'lumotlarning to'g'ri ekanligini tasdiqlang",
@@ -40,5 +41,7 @@
   "Sorry, the data type you submitted is not currently supported": "Kechirasiz, siz yuborgan maʼlumotlar turi hozirda qoʻllab-quvvatlanmaydi",
   "Yes": "Ha",
   "No": "Yo'q",
-  "Do you want to add ✍️ additional text ? 😊": "Qo'shimcha matn ✍️ qo'shmoqchimisiz? 😊"
+  "Do you want to add ✍️ additional text ? 😊": "Qo'shimcha matn ✍️ qo'shmoqchimisiz? 😊",
+  "Please enter text": "Iltimos, matn kiriting",
+  "Enter additional text for BODY ⌨️": "BODY uchun qo'shimcha matn kiriting ⌨️"
 }

@@ -4,6 +4,7 @@ import { context } from "../states/state.js";
 import { createInlineKeyboard } from "../utils/helpers.js";
 import answerCallbackQuery from "./answerCallbackQuery.js";
 import sendMessage from "./sendMessage.js";
+import setReminder from "./setReminder.js";
 
 async function show_menu(queryId, chatId) {
   await context.setContext(chatId, "isRepetitioning", () => false);
@@ -43,6 +44,7 @@ async function show_menu(queryId, chatId) {
       ],
     ]),
   });
+  await setReminder(chatId);
   await answerCallbackQuery(queryId, "");
 }
 
