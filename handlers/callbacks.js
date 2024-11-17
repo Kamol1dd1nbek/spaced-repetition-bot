@@ -357,6 +357,55 @@ ${
         return answerCallbackQuery(queryId, "Repetition not found!");
       answerCallbackQuery(queryId, "Loading ...");
       await context.setContext(chatId, "isFormated", () => true);
+
+      if (thisRepetition.type !== "text") {
+        return await sendMediaMessage(
+          chatId,
+          thisRepetition,
+          {
+            ...createInlineKeyboard([
+              [
+                {
+                  text: `❌ ${await t("False", chatId)}`,
+                  callback_data: `false_${thisRepetition._id}`,
+                },
+                {
+                  text: `✅ ${await t("True", chatId)}`,
+                  callback_data: `true_${thisRepetition._id}`,
+                },
+              ],
+              [
+                {
+                  text: `🔄 ${await t("Again", chatId)}`,
+                  callback_data: `again_${thisRepetition._id}`,
+                },
+                {
+                  text: `😎 ${await t("Easy", chatId)}`,
+                  callback_data: `easy_${thisRepetition._id}`,
+                },
+                {
+                  text: `📋 ${await t("Others", chatId)}`,
+                  callback_data: `get_list`,
+                },
+              ],
+            ]),
+          },
+          `     
+      📜 ${await t("Body", chatId)}: 👆
+      ${
+        thisRepetition.bodyText !== undefined
+          ? `\n💬 ${await t("Body text", chatId)}: ${thisRepetition.bodyText}\n`
+          : ""
+      }
+📌 ${await t("Title", chatId)}: *${thisRepetition.title}*
+      ${
+        thisRepetition.subtitle !== undefined
+          ? `\n🖋️ ${await t("Subtitle", chatId)}: ${thisRepetition.subtitle}\n`
+          : ""
+      }
+      `,
+        );
+      }
       await sendMessage(
         `
 🧠 ${await t("Repeat this", chatId)}:
@@ -400,7 +449,6 @@ ${
           ]),
         },
       );
-
       break;
 
     case data.startsWith("lang_"):

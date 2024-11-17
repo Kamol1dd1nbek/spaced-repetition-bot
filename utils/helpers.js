@@ -85,25 +85,29 @@ function createInlineKeyboard(buttons) {
 }
 
 async function clearTrash(chatId, msgId) {
-  if (!msgId) {
-    const trash = await context.getContext(chatId, "trash");
-    if (!trash) return;
-    for (let message of trash) {
-      try {
-        await bot.deleteMessage(message.chat_id, message.message_id);
-        await context.setContext(chatId, "trash", (trash) =>
-          trash.filter(
-            (msg) =>
-              msg.chat_id !== message.chat_id &&
-              msg.message_id !== message.message_id,
-          ),
-        );
-      } catch (error) {
-        console.log(error.message);
+  try {
+    if (!msgId) {
+      const trash = await context.getContext(chatId, "trash");
+      if (!trash) return;
+      for (let message of trash) {
+        try {
+          await bot.deleteMessage(message.chat_id, message.message_id);
+          await context.setContext(chatId, "trash", (trash) =>
+            trash.filter(
+              (msg) =>
+                msg.chat_id !== message.chat_id &&
+                msg.message_id !== message.message_id,
+            ),
+          );
+        } catch (error) {
+          console.log(error.message);
+        }
       }
+    } else {
+      await bot.deleteMessage(chatId, msgId);
     }
-  } else {
-    await bot.deleteMessage(chatId, msgId);
+  } catch (error) {
+    console.log("On helpers file clearTrash function line: 110", error.message);
   }
 }
 
