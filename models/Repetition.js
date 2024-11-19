@@ -5,6 +5,7 @@ const repetitionSchema = new mongoose.Schema({
   subtitle: { type: String },
   type: { type: String },
   fileId: { type: String },
+  body: { type: String },
   bodyText: { type: String },
   step: { type: Number, default: 1 },
   chatId: { type: Number, required: true },

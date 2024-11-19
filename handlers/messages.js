@@ -181,7 +181,7 @@ export default async function onMessage(msg) {
           return sendMessage("⚠️ Body cannot be empty", chatId);
         }
         await context.setContext(chatId, "newRepetition", (prevRepetition) => {
-          return { ...prevRepetition, bodyText: formatText(text) };
+          return { ...prevRepetition, body: formatText(text) };
         });
         await context.setContext(chatId, "newRepetition", (prevRepetition) => {
           return { ...prevRepetition, type: msgType };
@@ -201,7 +201,7 @@ export default async function onMessage(msg) {
               : ""
           }
 📜 ${await t("Body", chatId)}:\n
-${newRepData.bodyText}
+${newRepData.body}
           `,
           chatId,
           {

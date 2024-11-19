@@ -126,7 +126,7 @@ ${
     : ""
 }
 📜 ${await t("Body", chatId)}:\n
-||${thisRepetition.body}||
+||${thisRepetition.bodyText}||
           `,
           chatId,
           {
@@ -357,8 +357,7 @@ ${
         return answerCallbackQuery(queryId, "Repetition not found!");
       answerCallbackQuery(queryId, "Loading ...");
       await context.setContext(chatId, "isFormated", () => true);
-
-      if (thisRepetition.type !== "text") {
+      if (thisRepetition.type !== "text" && thisRepetition?.type) {
         return await sendMediaMessage(
           chatId,
           thisRepetition,
@@ -405,11 +404,15 @@ ${
       }
       `,
         );
-      }
-      await sendMessage(
-        `
+      } else {
+        if (!thisRepetition?.type) {
+          thisRepetition.type = "text";
+          await thisRepetition.save();
+        }
+        await sendMessage(
+          `
 🧠 ${await t("Repeat this", chatId)}:
-        
+          
 📌 ${await t("Title", chatId)}: *${thisRepetition.title}*
 ${
   thisRepetition.subtitle !== undefined
@@ -418,37 +421,38 @@ ${
 }
 📜 ${await t("Body", chatId)}:\n
 ||${thisRepetition.body}||
-        `,
-        chatId,
-        {
-          ...createInlineKeyboard([
-            [
-              {
-                text: `❌ ${await t("False", chatId)}`,
-                callback_data: `false_${thisRepetition._id}`,
-              },
-              {
-                text: `✅ ${await t("True", chatId)}`,
-                callback_data: `true_${thisRepetition._id}`,
-              },
-            ],
-            [
-              {
-                text: `🔄 ${await t("Again", chatId)}`,
-                callback_data: `again_${thisRepetition._id}`,
-              },
-              {
-                text: `😎 ${await t("Easy", chatId)}`,
-                callback_data: `easy_${thisRepetition._id}`,
-              },
-              {
-                text: `📋 ${await t("Others", chatId)}`,
-                callback_data: `get_list`,
-              },
-            ],
-          ]),
-        },
-      );
+          `,
+          chatId,
+          {
+            ...createInlineKeyboard([
+              [
+                {
+                  text: `❌ ${await t("False", chatId)}`,
+                  callback_data: `false_${thisRepetition._id}`,
+                },
+                {
+                  text: `✅ ${await t("True", chatId)}`,
+                  callback_data: `true_${thisRepetition._id}`,
+                },
+              ],
+              [
+                {
+                  text: `🔄 ${await t("Again", chatId)}`,
+                  callback_data: `again_${thisRepetition._id}`,
+                },
+                {
+                  text: `😎 ${await t("Easy", chatId)}`,
+                  callback_data: `easy_${thisRepetition._id}`,
+                },
+                {
+                  text: `📋 ${await t("Others", chatId)}`,
+                  callback_data: `get_list`,
+                },
+              ],
+            ]),
+          },
+        );
+      }
       break;
 
     case data.startsWith("lang_"):
