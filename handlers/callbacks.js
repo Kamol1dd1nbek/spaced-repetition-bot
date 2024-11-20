@@ -126,7 +126,7 @@ ${
     : ""
 }
 📜 ${await t("Body", chatId)}:\n
-||${thisRepetition.bodyText}||
+||${thisRepetition.body}||
           `,
           chatId,
           {
