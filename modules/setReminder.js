@@ -17,7 +17,7 @@ async function setReminder(chatId) {
 
   if (tId) clearInterval(tId);
   const nextRepetition = await getNextRepetition(chatId);
-  const earliestOverdueRepetition = await getEarliestOverdueRepetition();
+  const earliestOverdueRepetition = await getEarliestOverdueRepetition(chatId);
 
   if (earliestOverdueRepetition) {
     earliestOverdueRepetition.nextRepetition = addTimeStringToDate(
