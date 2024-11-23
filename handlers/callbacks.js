@@ -94,7 +94,7 @@ export default async function onCallbackQuery(callbackQuery) {
                   },
                   {
                     text: `📋 ${await t("Others", chatId)}`,
-                    callback_data: `get_list`,
+                    callback_data: `get_list_${thisRepetition._id}`,
                   },
                 ],
               ]),
@@ -152,7 +152,7 @@ ${
                 },
                 {
                   text: `📋 ${await t("Others", chatId)}`,
-                  callback_data: `get_list`,
+                  callback_data: `get_list_${thisRepetition._id}`,
                 },
               ],
             ]),
@@ -243,7 +243,20 @@ ${
       await answerCallbackQuery(queryId, "Next repetition date updated");
       break;
 
-    case data === "get_list":
+    case data.startsWith("get_list_"):
+      repetitionId = data.split("_")[2];
+      if (repetitionId !== "null") {
+        repetition = await findRepetitionById(repetitionId, chatId);
+        if (repetition) {
+          timesList = await repetitionsTimes.getState();
+          repetition.nextRepetition = addTimeStringToDate(
+            new Date(),
+            timesList[0],
+          );
+          await repetition.save();
+        }
+      }
+
       await context.setContext(chatId, "pagination", () => {
         return { currentPage: 1 };
       });
@@ -294,7 +307,7 @@ ${
               paginationData?.currentPage || 1,
               paginationData?.totalPages || 1,
             ),
-            [{ text: "🔙", callback_data: "get_list" }],
+            [{ text: "🔙", callback_data: `get_list_null` }],
           ]),
         },
       );
@@ -342,7 +355,7 @@ ${
               paginationData.currentPage,
               paginationData.totalPages,
             ),
-            [{ text: "🔙", callback_data: "get_list" }],
+            [{ text: "🔙", callback_data: `get_list_${rep._id}` }],
           ]),
         },
       );
@@ -384,7 +397,7 @@ ${
                 },
                 {
                   text: `📋 ${await t("Others", chatId)}`,
-                  callback_data: `get_list`,
+                  callback_data: `get_list_${thisRepetition._id}`,
                 },
               ],
             ]),
@@ -446,7 +459,7 @@ ${
                 },
                 {
                   text: `📋 ${await t("Others", chatId)}`,
-                  callback_data: `get_list`,
+                  callback_data: `get_list_${thisRepetition._id}`,
                 },
               ],
             ]),

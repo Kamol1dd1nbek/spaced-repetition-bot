@@ -39,7 +39,7 @@ async function show_menu(queryId, chatId) {
       [
         {
           text: `🔄 ${await t("Reload", chatId)}`,
-          callback_data: "get_list",
+          callback_data: "get_list_null",
         },
       ],
     ]),

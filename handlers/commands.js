@@ -30,7 +30,7 @@ export default async function onCommand(msg) {
             [
               {
                 text: await t("Continue", chatId),
-                callback_data: "get_list",
+                callback_data: "get_list_null",
               },
             ],
           ]),
@@ -59,7 +59,7 @@ Text formatting guide:
           [
             {
               text: "Continue",
-              callback_data: "get_list",
+              callback_data: "get_list_null",
             },
           ],
         ]),

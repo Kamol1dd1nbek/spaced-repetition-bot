@@ -1,7 +1,11 @@
 import t from "../langs/index.js";
-import { getNextRepetition } from "../services/repetitionService.js";
-import { context } from "../states/state.js";
 import {
+  getEarliestOverdueRepetition,
+  getNextRepetition,
+} from "../services/repetitionService.js";
+import { context, repetitionsTimes } from "../states/state.js";
+import {
+  addTimeStringToDate,
   createInlineKeyboard,
   getTimeDifferenceInMilliseconds,
 } from "../utils/helpers.js";
@@ -13,6 +17,15 @@ async function setReminder(chatId) {
 
   if (tId) clearInterval(tId);
   const nextRepetition = await getNextRepetition(chatId);
+  const earliestOverdueRepetition = await getEarliestOverdueRepetition();
+
+  if (earliestOverdueRepetition) {
+    earliestOverdueRepetition.nextRepetition = addTimeStringToDate(
+      new Date(),
+      "25 minutes",
+    );
+    earliestOverdueRepetition.save();
+  }
 
   if (nextRepetition) {
     tId = setTimeout(
@@ -48,7 +61,7 @@ async function setReminder(chatId) {
                     },
                     {
                       text: `📋 ${await t("Others", chatId)}`,
-                      callback_data: `get_list`,
+                      callback_data: `get_list_${nextRepetition._id}`,
                     },
                   ],
                 ]),
@@ -106,7 +119,7 @@ async function setReminder(chatId) {
                     },
                     {
                       text: `📋 ${await t("Others", chatId)}`,
-                      callback_data: `get_list`,
+                      callback_data: `get_list_${nextRepetition._id}`,
                     },
                   ],
                 ]),
@@ -114,6 +127,13 @@ async function setReminder(chatId) {
             );
           }
           setReminder(chatId);
+        } else {
+          const timesList = await repetitionsTimes.getState();
+          console.log(nextRepetition._id, new Date());
+          nextRepetition.nextRepetition = addTimeStringToDate(
+            new Date(),
+            timesList[0],
+          );
         }
       },
       getTimeDifferenceInMilliseconds(
