@@ -355,7 +355,7 @@ ${
               paginationData.currentPage,
               paginationData.totalPages,
             ),
-            [{ text: "🔙", callback_data: `get_list_${rep._id}` }],
+            [{ text: "🔙", callback_data: `get_list_null` }],
           ]),
         },
       );
