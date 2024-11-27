@@ -1,6 +1,6 @@
 import t from "../langs/index.js";
 import {
-  getEarliestOverdueRepetition,
+  getFarthestOverdueRepetition,
   getNextRepetition,
 } from "../services/repetitionService.js";
 import { context, repetitionsTimes } from "../states/state.js";
@@ -17,7 +17,7 @@ async function setReminder(chatId) {
 
   if (tId) clearInterval(tId);
   const nextRepetition = await getNextRepetition(chatId);
-  const earliestOverdueRepetition = await getEarliestOverdueRepetition(chatId);
+  const earliestOverdueRepetition = await getFarthestOverdueRepetition(chatId);
 
   if (earliestOverdueRepetition) {
     earliestOverdueRepetition.nextRepetition = addTimeStringToDate(

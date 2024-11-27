@@ -48,14 +48,16 @@ async function getRepetitions(page = 1, filter = {}, limit = 10) {
   };
 }
 
-async function getEarliestOverdueRepetition(chatId) {
+async function getFarthestOverdueRepetition(chatId) {
   try {
     const now = new Date();
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(now.getDate() - 7);
 
     return await Repetition.findOne({
       chatId,
-      nextRepetition: { $lt: now },
-    }).sort({ nextRepetition: 1 });
+      nextRepetition: { $lt: oneWeekAgo },
+    }).sort({ nextRepetition: -1 });
   } catch (error) {
     console.error(error);
   }
@@ -139,5 +141,5 @@ export {
   findRepetitionById,
   getOldRepetitions,
   getNextRepetition,
-  getEarliestOverdueRepetition,
+  getFarthestOverdueRepetition,
 };
