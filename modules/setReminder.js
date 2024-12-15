@@ -34,7 +34,10 @@ async function setReminder(chatId) {
           await context.setContext(chatId, "isFormated", () => true);
           await context.setContext(chatId, "isRepetitioning", () => true);
 
-          if (nextRepetition.type !== "text" && nextRepetition?.type !== undefined) {
+          if (
+            nextRepetition.type !== "text" &&
+            nextRepetition?.type !== undefined
+          ) {
             return await sendMediaMessage(
               chatId,
               nextRepetition,

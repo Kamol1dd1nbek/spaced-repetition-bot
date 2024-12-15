@@ -43,5 +43,9 @@
   "No": "Yo'q",
   "Do you want to add ✍️ additional text ? 😊": "Qo'shimcha matn ✍️ qo'shmoqchimisiz? 😊",
   "Please enter text": "Iltimos, matn kiriting",
-  "Enter additional text for BODY ⌨️": "BODY uchun qo'shimcha matn kiriting ⌨️"
+  "Enter additional text for BODY ⌨️": "BODY uchun qo'shimcha matn kiriting ⌨️",
+  "Are you sure you want to delete this repetition?": "Haqiqatan ham bu takrorlashni oʻchirib tashlamoqchimisiz?",
+  "Confirm deletion": "O'chirishni tasdiqlang",
+  "Delete": "O'chirish",
+  "Deleted": "O'chirildi"
 }

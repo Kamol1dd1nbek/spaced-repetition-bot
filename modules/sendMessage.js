@@ -22,7 +22,9 @@ export default async function sendMessage(msg, chatId, options) {
         parse_mode: "MarkdownV2",
         ...options,
       });
-      await bot.deleteMessage(chatId, mainMsg.message_id);
+      if (mainMsg?.message_id)
+        await bot.deleteMessage(chatId, mainMsg?.message_id);
+
       await context.setContext(chatId, "mainMessage", () => sentMessage);
       await context.setContext(chatId, "isFormated", () => false);
     } else {

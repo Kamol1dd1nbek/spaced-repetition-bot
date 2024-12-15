@@ -16,6 +16,7 @@ import {
 import show_menu from "../modules/show_menu.js";
 import t from "../langs/index.js";
 import sendMediaMessage from "../modules/sendMediaMessage.js";
+import Repetition from "../models/Repetition.js";
 
 export default async function onCallbackQuery(callbackQuery) {
   const data = callbackQuery.data;
@@ -75,6 +76,10 @@ export default async function onCallbackQuery(callbackQuery) {
               ...createInlineKeyboard([
                 [
                   {
+                    text: `🗑 ${await t("Delete", chatId)}`,
+                    callback_data: `delete_${thisRepetition._id}`,
+                  },
+                  {
                     text: `❌ ${await t("False", chatId)}`,
                     callback_data: `false_${thisRepetition._id}`,
                   },
@@ -133,6 +138,10 @@ ${
             ...createInlineKeyboard([
               [
                 {
+                  text: `🗑 ${await t("Delete", chatId)}`,
+                  callback_data: `delete_${thisRepetition._id}`,
+                },
+                {
                   text: `❌ ${await t("False", chatId)}`,
                   callback_data: `false_${thisRepetition._id}`,
                 },
@@ -171,6 +180,84 @@ ${
       await context.setContext(chatId, "newRepetition", (user) => {
         return {};
       });
+      break;
+
+    case data.startsWith("delete_"):
+      try {
+        repetitionId = data.split("_")[1];
+        repetition = await findRepetitionById(repetitionId, chatId);
+        if (!repetition)
+          return answerCallbackQuery(queryId, "Repetition not found");
+        await context.setContext(chatId, "isRepetitioning", () => true);
+        await context.setContext(
+          chatId,
+          "currentAction",
+          (user) => "checkDeleting",
+        );
+        await answerCallbackQuery(
+          queryId,
+          `💾 ${await t("Confirm deletion", chatId)}`,
+        );
+        await sendMessage(
+          `${await t("Are you sure you want to delete this repetition?")}`,
+          chatId,
+          {
+            ...createInlineKeyboard([
+              [
+                {
+                  text: `🗑 ${await t("Delete", chatId)}`,
+                  callback_data: `confirm_delete_${repetitionId}`,
+                },
+                {
+                  text: `🔙 ${await t("Cancel", chatId)}`,
+                  callback_data: `get_list_null`,
+                },
+              ],
+            ]),
+          },
+        );
+      } catch (error) {
+        console.log(
+          ">> On check confirm deletion repetition: (callbacks.js) >> ",
+          error.message,
+        );
+        await bot.answerCallbackQuery(callbackQuery.id, {
+          text: `${await t("Something went wrong", chatId)}!`,
+          show_alert: true,
+        });
+      }
+      break;
+
+    case data.startsWith("confirm_delete_"):
+      try {
+        repetitionId = data.split("_")[2];
+        await Repetition.findByIdAndDelete(repetitionId).then(
+          async (result) => {
+            if (result) {
+              await bot.answerCallbackQuery(callbackQuery.id, {
+                text: `${await t("Deleted", chatId)}!`,
+              });
+            } else {
+              awaitbot.answerCallbackQuery(callbackQuery.id, {
+                text: `${await t("Repetition not found", chatId)}!`,
+                show_alert: true,
+              });
+            }
+          },
+        );
+        await context.setContext(chatId, "currentAction", (user) => "");
+        await context.setContext(chatId, "isRepetitioning", () => false);
+        await show_menu(queryId, chatId);
+      } catch (error) {
+        console.log(
+          ">> On deleting repetition: (callbacks.js) >> ",
+          error.message,
+        );
+        await bot.answerCallbackQuery(callbackQuery.id, {
+          text: `${await t("Something went wrong", chatId)}!`,
+          show_alert: true,
+        });
+      }
       break;
 
     case data.startsWith("false_"):
@@ -378,6 +465,10 @@ ${
             ...createInlineKeyboard([
               [
                 {
+                  text: `🗑 ${await t("Delete", chatId)}`,
+                  callback_data: `delete_${thisRepetition._id}`,
+                },
+                {
                   text: `❌ ${await t("False", chatId)}`,
                   callback_data: `false_${thisRepetition._id}`,
                 },
@@ -439,6 +530,10 @@ ${
           {
             ...createInlineKeyboard([
               [
+                {
+                  text: `🗑 ${await t("Delete", chatId)}`,
+                  callback_data: `delete_${thisRepetition._id}`,
+                },
                 {
                   text: `❌ ${await t("False", chatId)}`,
                   callback_data: `false_${thisRepetition._id}`,
