@@ -12,6 +12,7 @@ import {
   findRepetitionById,
   getOldRepetitions,
   saveRepetition,
+  updateCard,
 } from "../services/repetitionService.js";
 import show_menu from "../modules/show_menu.js";
 import t from "../langs/index.js";
@@ -32,7 +33,7 @@ export default async function onCallbackQuery(callbackQuery) {
   switch (true) {
     case data === "add_new":
       await context.setContext(chatId, "currentAction", (user) => "addTitle");
-      await context.setContext(chatId, "isRepetitioning", () => false);
+      await context.setContext(chatId, "isRepetitioning", () => true);
       await sendMessage(
         `📌 ${await t("Please enter the TITLE", chatId)}`,
         chatId,
@@ -262,70 +263,40 @@ ${
 
     case data.startsWith("false_"):
       repetitionId = data.split("_")[1];
-      repetition = await findRepetitionById(repetitionId, chatId);
-      if (!repetition)
+      // there is hard code: userId
+      if(await updateCard(1, repetitionId, 0) === false) {
         return answerCallbackQuery(queryId, "Repetition not found");
-      repetition.step = 2;
-      timesList = await repetitionsTimes.getState();
-      nextRepetitionDate = addTimeStringToDate(
-        new Date(),
-        timesList[repetition.step],
-      );
-      repetition.nextRepetition = nextRepetitionDate;
-      await repetition.save();
+      }
       await show_menu(queryId, chatId);
       await answerCallbackQuery(queryId, "Next repetition date updated");
       break;
 
     case data.startsWith("true_"):
       repetitionId = data.split("_")[1];
-      repetition = await findRepetitionById(repetitionId, chatId);
-      if (!repetition)
+      // there is hard code: userId
+      if(await updateCard(1, repetitionId, 2) === false) {
         return answerCallbackQuery(queryId, "Repetition not found");
-      repetition.step = repetition.step + 1;
-      timesList = await repetitionsTimes.getState();
-      nextRepetitionDate = addTimeStringToDate(
-        new Date(),
-        timesList[repetition.step],
-      );
-      repetition.nextRepetition = nextRepetitionDate;
-      await repetition.save();
+      }
       await show_menu(queryId, chatId);
       await answerCallbackQuery(queryId, "Next repetition date updated");
       break;
 
     case data.startsWith("again_"):
       repetitionId = data.split("_")[1];
-      repetition = await findRepetitionById(repetitionId, chatId);
-      if (!repetition)
-        return answerCallbackQuery(
-          queryId,
-          await t("Repetition not found", chatId),
-        );
-      timesList = await repetitionsTimes.getState();
-      nextRepetitionDate = addTimeStringToDate(new Date(), timesList[0]);
-      repetition.nextRepetition = nextRepetitionDate;
-      await repetition.save();
-      await answerCallbackQuery(
-        queryId,
-        await t("You will receive a reminder in 10 minutes", chatId),
-      );
+      // there is hard code: userId
+      if(await updateCard(1, repetitionId, 1) === false) {
+        return answerCallbackQuery(queryId, "Repetition not found");
+      }
       await show_menu(queryId, chatId);
+      await answerCallbackQuery(queryId, "Next repetition date updated");
       break;
 
     case data.startsWith("easy_"):
       repetitionId = data.split("_")[1];
-      repetition = await findRepetitionById(repetitionId, chatId);
-      if (!repetition)
+      // there is hard code: userId
+      if(await updateCard(1, repetitionId, 3) === false) {
         return answerCallbackQuery(queryId, "Repetition not found");
-      repetition.step = repetition.step + 2;
-      timesList = await repetitionsTimes.getState();
-      nextRepetitionDate = addTimeStringToDate(
-        new Date(),
-        timesList[repetition.step],
-      );
-      repetition.nextRepetition = nextRepetitionDate;
-      await repetition.save();
+      }
       await show_menu(queryId, chatId);
       await answerCallbackQuery(queryId, "Next repetition date updated");
       break;
@@ -357,7 +328,7 @@ ${
         chatId,
         paginationData?.currentPage || 1,
       );
-
+      
       paginationData = await context.setContext(
         chatId,
         "pagination",
