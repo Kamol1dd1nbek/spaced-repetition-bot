@@ -11,7 +11,11 @@ const repetitionSchema = new mongoose.Schema({
   chatId: { type: Number, required: true },
   createdDate: { type: Date, default: Date.now },
   nextRepetition: { type: Date, default: Date.now },
-});
+  stability: { type: Number, default: 1 },
+  lastReview: { type: Date, default: Date.now },
+  lastInterval: { type: Number, default: 10 },
+  responseHistory: { type: [Number], default: [] }, 
+}, { versionKey: false });
 
 const Repetition = mongoose.model("Repetition", repetitionSchema);
 

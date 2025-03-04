@@ -142,4 +142,83 @@ export {
   getOldRepetitions,
   getNextRepetition,
   getFarthestOverdueRepetition,
+  updateCard
 };
+
+//  ----- new feature
+
+const WAKE_UP_TIME = 4 * 60; // 04:00 → 240 minut
+const SLEEP_TIME = 24 * 60; // 00:00 → 1440 minut
+
+async function updateCard(userId, cardId, response, ) {
+  const card = await Repetition.findOne({ _id: cardId });
+  if (!card) return false;
+  
+  const now = new Date();
+  const timeDiff = (now - new Date(card.lastReview || new Date().setHours(1))) / (1000 * 60); // Minutlarda
+  
+  let newStep = card.step;
+  let newStability = card.stability || 1;
+  let responseHistory = card.responseHistory || [];
+  
+  responseHistory.push(response);
+  if (responseHistory.length > 3) responseHistory.shift();
+  
+  const lastResponses = responseHistory.map((r) => r.response);
+  const avgResponse = lastResponses.reduce((a, b) => a + b, 0) / lastResponses.length;
+  
+  switch (response) {
+    case 0: // **Hech eslay olmadim**
+    newStability = Math.max(1, newStability * 0.5);
+    newStep = Math.max(1, newStep * 0.5);
+    break;
+    case 1: // **Zo‘rg‘a esladim**
+    newStability = Math.max(1, newStability * 0.8);
+    newStep *= 1.2;
+    break;
+    case 2: // **Oson esladim**
+    newStability += 1;
+    newStep *= 1.5;
+    break;
+    case 3: // **Juda yaxshi bilaman**
+    newStability += 2;
+    newStep *= 2;
+    break;
+  }
+  
+  if (avgResponse >= 2) newStep *= 1.3;
+  else if (avgResponse < 1) newStep *= 0.7;
+  
+  if (timeDiff < card.lastInterval * 0.5) {
+    newStep *= 1.1;
+  } else if (timeDiff > card.lastInterval * 2) {
+    newStep *= 0.9;
+  }
+  
+  let nextReviewTime = new Date(now.getTime() + newStep * 60 * 1000);
+  let nextReviewMinutes = nextReviewTime.getHours() * 60 + nextReviewTime.getMinutes();
+  
+  if (nextReviewMinutes > SLEEP_TIME || nextReviewMinutes < WAKE_UP_TIME) {
+    nextReviewTime.setHours(WAKE_UP_TIME / 60, WAKE_UP_TIME % 60, 0, 0);
+  }
+
+  // Update data
+  await Repetition.updateOne(
+    { _id: cardId },
+    {
+      $set: {
+        step: newStep,
+        stability: newStability,
+        lastInterval: newStep,
+        lastReview: now,
+        nextRepetition: nextReviewTime,
+        responseHistory: responseHistory,
+      },
+    }
+  );
+}
+
+async function getNextReview(db, cardId) {
+  const card = await db.collection("cards").findOne({ _id: new ObjectId(cardId) });
+  return card ? new Date(card.nextRepetition) : null;
+}
