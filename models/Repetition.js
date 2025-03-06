@@ -14,7 +14,9 @@ const repetitionSchema = new mongoose.Schema({
   stability: { type: Number, default: 1 },
   lastReview: { type: Date, default: Date.now },
   lastInterval: { type: Number, default: 10 },
-  responseHistory: { type: [Number], default: [] }, 
+  responseHistory: { type: [Number], default: [] },
+  eFactor: { type: Number, default: 2.5 },
+  repetitions: { type: Number, default: 0 }  
 }, { versionKey: false });
 
 const Repetition = mongoose.model("Repetition", repetitionSchema);
