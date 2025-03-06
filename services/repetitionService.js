@@ -155,7 +155,6 @@ async function updateCard(userId, cardId, response, ) {
   if (!card) return false;
   
   const now = new Date();
-  const timeDiff = (now - new Date(card.lastReview || new Date().setHours(1))) / (1000 * 60); // Minutlarda
   
   let newStep = card.step;
   let newStability = card.stability || 1;
@@ -188,12 +187,6 @@ async function updateCard(userId, cardId, response, ) {
   
   if (avgResponse >= 2) newStep *= 1.3;
   else if (avgResponse < 1) newStep *= 0.7;
-  
-  if (timeDiff < card.lastInterval * 0.5) {
-    newStep *= 1.1;
-  } else if (timeDiff > card.lastInterval * 2) {
-    newStep *= 0.9;
-  }
   
   let nextReviewTime = new Date(now.getTime() + newStep * 60 * 1000);
   let nextReviewMinutes = nextReviewTime.getHours() * 60 + nextReviewTime.getMinutes();
