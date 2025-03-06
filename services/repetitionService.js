@@ -147,9 +147,6 @@ export {
 
 //  ----- new feature
 
-const WAKE_UP_TIME = 4 * 60; // 04:00 → 240 minut
-const SLEEP_TIME = 24 * 60; // 00:00 → 1440 minut
-
 async function updateCard(userId, cardId, response, ) {
   const card = await Repetition.findOne({ _id: cardId });
   if (!card) return false;
@@ -162,14 +159,14 @@ async function updateCard(userId, cardId, response, ) {
   
   responseHistory.push(response);
   if (responseHistory.length > 3) responseHistory.shift();
-  
-  const lastResponses = responseHistory.map((r) => r.response);
-  const avgResponse = lastResponses.reduce((a, b) => a + b, 0) / lastResponses.length;
+  const avgResponse = responseHistory.length > 0 
+  ? responseHistory.reduce((a, b) => a + b, 0) / responseHistory.length
+  : 1;
   
   switch (response) {
     case 0: // **Hech eslay olmadim**
     newStability = Math.max(1, newStability * 0.5);
-    newStep = Math.max(1, newStep * 0.5);
+    newStep = Math.max(1, newStability * 0.5);
     break;
     case 1: // **Zo‘rg‘a esladim**
     newStability = Math.max(1, newStability * 0.8);
@@ -188,12 +185,8 @@ async function updateCard(userId, cardId, response, ) {
   if (avgResponse >= 2) newStep *= 1.3;
   else if (avgResponse < 1) newStep *= 0.7;
   
+  newStep = Math.max(5, newStep);
   let nextReviewTime = new Date(now.getTime() + newStep * 60 * 1000);
-  let nextReviewMinutes = nextReviewTime.getHours() * 60 + nextReviewTime.getMinutes();
-  
-  if (nextReviewMinutes > SLEEP_TIME || nextReviewMinutes < WAKE_UP_TIME) {
-    nextReviewTime.setHours(WAKE_UP_TIME / 60, WAKE_UP_TIME % 60, 0, 0);
-  }
 
   // Update data
   await Repetition.updateOne(
