@@ -147,58 +147,45 @@ export {
 
 //  ----- new feature
 
-async function updateCard(userId, cardId, response, ) {
+async function updateCard(userId, cardId, response) {
   const card = await Repetition.findOne({ _id: cardId });
   if (!card) return false;
-  
-  const now = new Date();
-  
-  let newStep = card.step;
-  let newStability = card.stability || 1;
-  let responseHistory = card.responseHistory || [];
-  
-  responseHistory.push(response);
-  if (responseHistory.length > 3) responseHistory.shift();
-  const avgResponse = responseHistory.length > 0 
-  ? responseHistory.reduce((a, b) => a + b, 0) / responseHistory.length
-  : 1;
-  
-  switch (response) {
-    case 0: // **Hech eslay olmadim**
-    newStability = Math.max(1, newStability * 0.5);
-    newStep = Math.max(1, newStability * 0.5);
-    break;
-    case 1: // **Zo‘rg‘a esladim**
-    newStability = Math.max(1, newStability * 0.8);
-    newStep *= 1.2;
-    break;
-    case 2: // **Oson esladim**
-    newStability += 1;
-    newStep *= 1.5;
-    break;
-    case 3: // **Juda yaxshi bilaman**
-    newStability += 2;
-    newStep *= 2;
-    break;
-  }
-  
-  if (avgResponse >= 2) newStep *= 1.3;
-  else if (avgResponse < 1) newStep *= 0.7;
-  
-  newStep = Math.max(5, newStep);
-  let nextReviewTime = new Date(now.getTime() + newStep * 60 * 1000);
 
-  // Update data
+  const now = new Date();
+
+  let interval = card.step || 1; // SM-2 da 1 kunlik boshlang‘ich interval
+  let eFactor = card.eFactor || 2.5;
+  let repetitions = card.repetitions || 0;
+
+  // SM-2 bo‘yicha eFactor yangilash
+  eFactor = eFactor + (0.1 - (5 - response) * (0.08 + (5 - response) * 0.02));
+  eFactor = Math.max(1.3, eFactor); // Minimal EF: 1.3
+
+  if (response < 3) {
+    // Agar foydalanuvchi noto‘g‘ri yoki qiyin javob bersa, qayta ko‘rish tezlashadi
+    repetitions = 0;
+    interval = 1; // Darhol takrorlash uchun
+  } else {
+    // SM-2 interval hisoblash
+    if (repetitions === 0) interval = 1;
+    else if (repetitions === 1) interval = 6;
+    else interval = Math.round(interval * eFactor);
+
+    repetitions += 1; // Takrorlash sonini oshirish
+  }
+
+  let nextReviewTime = new Date(now.getTime() + interval * 24 * 60 * 60 * 1000);
+  console.log(nextReviewTime, cardId)
+
   await Repetition.updateOne(
     { _id: cardId },
     {
       $set: {
-        step: newStep,
-        stability: newStability,
-        lastInterval: newStep,
+        step: interval,
+        eFactor: eFactor,
+        repetitions: repetitions,
         lastReview: now,
         nextRepetition: nextReviewTime,
-        responseHistory: responseHistory,
       },
     }
   );
