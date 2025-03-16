@@ -45,28 +45,42 @@ async function setReminder(chatId) {
                 ...createInlineKeyboard([
                   [
                     {
-                      text: `❌ ${await t("False", chatId)}`,
-                      callback_data: `false_${nextRepetition._id}`,
+                      text: "0",
+                      callback_data: `response_${nextRepetition._id}_0`,
                     },
                     {
-                      text: `✅ ${await t("True", chatId)}`,
-                      callback_data: `true_${nextRepetition._id}`,
+                      text: "1",
+                      callback_data: `response_${nextRepetition._id}_1`,
                     },
+                    {
+                      text: "2",
+                      callback_data: `response_${nextRepetition._id}_2`,
+                    }
                   ],
                   [
                     {
-                      text: `🔄 ${await t("Again", chatId)}`,
-                      callback_data: `again_${nextRepetition._id}`,
+                      text: "3",
+                      callback_data: `response_${nextRepetition._id}_3`,
                     },
                     {
-                      text: `😎 ${await t("Easy", chatId)}`,
-                      callback_data: `easy_${nextRepetition._id}`,
+                      text: "4",
+                      callback_data: `response_${nextRepetition._id}_4`,
+                    },
+                    {
+                      text: "5",
+                      callback_data: `response_${nextRepetition._id}_5`,
+                    }
+                  ],
+                  [
+                    {
+                      text: `🗑 ${await t("Delete", chatId)}`,
+                      callback_data: `delete_${nextRepetition._id}`,
                     },
                     {
                       text: `📋 ${await t("Others", chatId)}`,
                       callback_data: `get_list_${nextRepetition._id}`,
                     },
-                  ],
+                  ]
                 ]),
               },
               `     
@@ -103,28 +117,42 @@ async function setReminder(chatId) {
                 ...createInlineKeyboard([
                   [
                     {
-                      text: `❌ ${await t("False", chatId)}`,
-                      callback_data: `false_${nextRepetition._id}`,
+                      text: "0",
+                      callback_data: `response_${nextRepetition._id}_0`,
                     },
                     {
-                      text: `✅ ${await t("True", chatId)}`,
-                      callback_data: `true_${nextRepetition._id}`,
+                      text: "1",
+                      callback_data: `response_${nextRepetition._id}_1`,
                     },
+                    {
+                      text: "2",
+                      callback_data: `response_${nextRepetition._id}_2`,
+                    }
                   ],
                   [
                     {
-                      text: `🔄 ${await t("Again", chatId)}`,
-                      callback_data: `again_${nextRepetition._id}`,
+                      text: "3",
+                      callback_data: `response_${nextRepetition._id}_3`,
                     },
                     {
-                      text: `😎 ${await t("Easy", chatId)}`,
-                      callback_data: `easy_${nextRepetition._id}`,
+                      text: "4",
+                      callback_data: `response_${nextRepetition._id}_4`,
+                    },
+                    {
+                      text: "5",
+                      callback_data: `response_${nextRepetition._id}_5`,
+                    }
+                  ],
+                  [
+                    {
+                      text: `🗑 ${await t("Delete", chatId)}`,
+                      callback_data: `delete_${nextRepetition._id}`,
                     },
                     {
                       text: `📋 ${await t("Others", chatId)}`,
                       callback_data: `get_list_${nextRepetition._id}`,
                     },
-                  ],
+                  ]
                 ]),
               },
             );

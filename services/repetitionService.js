@@ -145,50 +145,41 @@ export {
   updateCard
 };
 
-//  ----- new feature
+function getFutureDate(days = 0, hours = 0) {
+  let futureDate = new Date();
+  futureDate.setDate(futureDate.getDate() + days);
+  futureDate.setHours(futureDate.getHours() + hours);
+  return futureDate;
+}
+
+function updateEFactor(eFactor, response) {
+  let newEFactor = eFactor + (0.1 - (5 - response) * (0.08 + (5 - response) * 0.02));
+  return newEFactor < 1.3 ? 1.3 : newEFactor;
+}
 
 async function updateCard(userId, cardId, response) {
   const card = await Repetition.findOne({ _id: cardId });
   if (!card) return false;
 
-  const now = new Date();
+  if(response < 3) {
+    card.interval = 1;
+    card.repetitions = 0;
 
-  let interval = card.step || 1; // SM-2 da 1 kunlik boshlang‘ich interval
-  let eFactor = card.eFactor || 2.5;
-  let repetitions = card.repetitions || 0;
-
-  // SM-2 bo‘yicha eFactor yangilash
-  eFactor = eFactor + (0.1 - (5 - response) * (0.08 + (5 - response) * 0.02));
-  eFactor = Math.max(1.3, eFactor); // Minimal EF: 1.3
-
-  if (response < 3) {
-    // Agar foydalanuvchi noto‘g‘ri yoki qiyin javob bersa, qayta ko‘rish tezlashadi
-    repetitions = 0;
-    interval = 1; // Darhol takrorlash uchun
+    card.nextRepetition = getFutureDate(0, 1);
   } else {
-    // SM-2 interval hisoblash
-    if (repetitions === 0) interval = 1;
-    else if (repetitions === 1) interval = 6;
-    else interval = Math.round(interval * eFactor);
-
-    repetitions += 1; // Takrorlash sonini oshirish
+    card.repetitions++;
+    if(card.repetitions === 1) {
+      card.interval = 1;
+    } else if (card.repetitions === 2) {
+      card.interval = 6;
+    } else {
+      card.eFactor = updateEFactor(card.eFactor, response);
+      card.interval = Math.ceil(card.interval * card.eFactor);
+    }
+    card.nextRepetition = getFutureDate(card.interval);
   }
 
-  let nextReviewTime = new Date(now.getTime() + interval * 24 * 60 * 60 * 1000);
-  console.log(nextReviewTime, cardId)
-
-  await Repetition.updateOne(
-    { _id: cardId },
-    {
-      $set: {
-        step: interval,
-        eFactor: eFactor,
-        repetitions: repetitions,
-        lastReview: now,
-        nextRepetition: nextReviewTime,
-      },
-    }
-  );
+  await card.save();
 }
 
 async function getNextReview(db, cardId) {
