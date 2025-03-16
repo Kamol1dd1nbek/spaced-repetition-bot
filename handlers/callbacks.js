@@ -77,32 +77,42 @@ export default async function onCallbackQuery(callbackQuery) {
               ...createInlineKeyboard([
                 [
                   {
-                    text: `🗑 ${await t("Delete", chatId)}`,
-                    callback_data: `delete_${thisRepetition._id}`,
+                    text: "0",
+                    callback_data: `response_${thisRepetition._id}_0`,
                   },
                   {
-                    text: `❌ ${await t("False", chatId)}`,
-                    callback_data: `false_${thisRepetition._id}`,
+                    text: "1",
+                    callback_data: `response_${thisRepetition._id}_1`,
                   },
                   {
-                    text: `✅ ${await t("True", chatId)}`,
-                    callback_data: `true_${thisRepetition._id}`,
-                  },
+                    text: "2",
+                    callback_data: `response_${thisRepetition._id}_2`,
+                  }
                 ],
                 [
                   {
-                    text: `🔄 ${await t("Again", chatId)}`,
-                    callback_data: `again_${thisRepetition._id}`,
+                    text: "3",
+                    callback_data: `response_${thisRepetition._id}_3`,
                   },
                   {
-                    text: `😎 ${await t("Easy", chatId)}`,
-                    callback_data: `easy_${thisRepetition._id}`,
+                    text: "4",
+                    callback_data: `response_${thisRepetition._id}_4`,
+                  },
+                  {
+                    text: "5",
+                    callback_data: `response_${thisRepetition._id}_5`,
+                  }
+                ],
+                [
+                  {
+                    text: `🗑 ${await t("Delete", chatId)}`,
+                    callback_data: `delete_${thisRepetition._id}`,
                   },
                   {
                     text: `📋 ${await t("Others", chatId)}`,
                     callback_data: `get_list_${thisRepetition._id}`,
                   },
-                ],
+                ]
               ]),
             },
             `     
@@ -139,32 +149,42 @@ ${
             ...createInlineKeyboard([
               [
                 {
-                  text: `🗑 ${await t("Delete", chatId)}`,
-                  callback_data: `delete_${thisRepetition._id}`,
+                  text: "0",
+                  callback_data: `response_${thisRepetition._id}_0`,
                 },
                 {
-                  text: `❌ ${await t("False", chatId)}`,
-                  callback_data: `false_${thisRepetition._id}`,
+                  text: "1",
+                  callback_data: `response_${thisRepetition._id}_1`,
                 },
                 {
-                  text: `✅ ${await t("True", chatId)}`,
-                  callback_data: `true_${thisRepetition._id}`,
-                },
+                  text: "2",
+                  callback_data: `response_${thisRepetition._id}_2`,
+                }
               ],
               [
                 {
-                  text: `🔄 ${await t("Again", chatId)}`,
-                  callback_data: `again_${thisRepetition._id}`,
+                  text: "3",
+                  callback_data: `response_${thisRepetition._id}_3`,
                 },
                 {
-                  text: `😎 ${await t("Easy", chatId)}`,
-                  callback_data: `easy_${thisRepetition._id}`,
+                  text: "4",
+                  callback_data: `response_${thisRepetition._id}_4`,
+                },
+                {
+                  text: "5",
+                  callback_data: `response_${thisRepetition._id}_5`,
+                }
+              ],
+              [
+                {
+                  text: `🗑 ${await t("Delete", chatId)}`,
+                  callback_data: `delete_${thisRepetition._id}`,
                 },
                 {
                   text: `📋 ${await t("Others", chatId)}`,
                   callback_data: `get_list_${thisRepetition._id}`,
                 },
-              ],
+              ]
             ]),
           },
         );
@@ -261,40 +281,10 @@ ${
       }
       break;
 
-    case data.startsWith("false_"):
+    case data.startsWith("response_"):
       repetitionId = data.split("_")[1];
       // there is hard code: userId
-      if(await updateCard(1, repetitionId, 0) === false) {
-        return answerCallbackQuery(queryId, "Repetition not found");
-      }
-      await show_menu(queryId, chatId);
-      await answerCallbackQuery(queryId, "Next repetition date updated");
-      break;
-
-    case data.startsWith("true_"):
-      repetitionId = data.split("_")[1];
-      // there is hard code: userId
-      if(await updateCard(1, repetitionId, 2) === false) {
-        return answerCallbackQuery(queryId, "Repetition not found");
-      }
-      await show_menu(queryId, chatId);
-      await answerCallbackQuery(queryId, "Next repetition date updated");
-      break;
-
-    case data.startsWith("again_"):
-      repetitionId = data.split("_")[1];
-      // there is hard code: userId
-      if(await updateCard(1, repetitionId, 1) === false) {
-        return answerCallbackQuery(queryId, "Repetition not found");
-      }
-      await show_menu(queryId, chatId);
-      await answerCallbackQuery(queryId, "Next repetition date updated");
-      break;
-
-    case data.startsWith("easy_"):
-      repetitionId = data.split("_")[1];
-      // there is hard code: userId
-      if(await updateCard(1, repetitionId, 3) === false) {
+      if(await updateCard(1, repetitionId, data.split("_")[2] * 1) === false) {
         return answerCallbackQuery(queryId, "Repetition not found");
       }
       await show_menu(queryId, chatId);
@@ -436,32 +426,42 @@ ${
             ...createInlineKeyboard([
               [
                 {
-                  text: `🗑 ${await t("Delete", chatId)}`,
-                  callback_data: `delete_${thisRepetition._id}`,
+                  text: "0",
+                  callback_data: `response_${thisRepetition._id}_0`,
                 },
                 {
-                  text: `❌ ${await t("False", chatId)}`,
-                  callback_data: `false_${thisRepetition._id}`,
+                  text: "1",
+                  callback_data: `response_${thisRepetition._id}_1`,
                 },
                 {
-                  text: `✅ ${await t("True", chatId)}`,
-                  callback_data: `true_${thisRepetition._id}`,
-                },
+                  text: "2",
+                  callback_data: `response_${thisRepetition._id}_2`,
+                }
               ],
               [
                 {
-                  text: `🔄 ${await t("Again", chatId)}`,
-                  callback_data: `again_${thisRepetition._id}`,
+                  text: "3",
+                  callback_data: `response_${thisRepetition._id}_3`,
                 },
                 {
-                  text: `😎 ${await t("Easy", chatId)}`,
-                  callback_data: `easy_${thisRepetition._id}`,
+                  text: "4",
+                  callback_data: `response_${thisRepetition._id}_4`,
+                },
+                {
+                  text: "5",
+                  callback_data: `response_${thisRepetition._id}_5`,
+                }
+              ],
+              [
+                {
+                  text: `🗑 ${await t("Delete", chatId)}`,
+                  callback_data: `delete_${thisRepetition._id}`,
                 },
                 {
                   text: `📋 ${await t("Others", chatId)}`,
                   callback_data: `get_list_${thisRepetition._id}`,
                 },
-              ],
+              ]
             ]),
           },
           `     
@@ -502,32 +502,42 @@ ${
             ...createInlineKeyboard([
               [
                 {
-                  text: `🗑 ${await t("Delete", chatId)}`,
-                  callback_data: `delete_${thisRepetition._id}`,
+                  text: "0",
+                  callback_data: `response_${thisRepetition._id}_0`,
                 },
                 {
-                  text: `❌ ${await t("False", chatId)}`,
-                  callback_data: `false_${thisRepetition._id}`,
+                  text: "1",
+                  callback_data: `response_${thisRepetition._id}_1`,
                 },
                 {
-                  text: `✅ ${await t("True", chatId)}`,
-                  callback_data: `true_${thisRepetition._id}`,
-                },
+                  text: "2",
+                  callback_data: `response_${thisRepetition._id}_2`,
+                }
               ],
               [
                 {
-                  text: `🔄 ${await t("Again", chatId)}`,
-                  callback_data: `again_${thisRepetition._id}`,
+                  text: "3",
+                  callback_data: `response_${thisRepetition._id}_3`,
                 },
                 {
-                  text: `😎 ${await t("Easy", chatId)}`,
-                  callback_data: `easy_${thisRepetition._id}`,
+                  text: "4",
+                  callback_data: `response_${thisRepetition._id}_4`,
+                },
+                {
+                  text: "5",
+                  callback_data: `response_${thisRepetition._id}_5`,
+                }
+              ],
+              [
+                {
+                  text: `🗑 ${await t("Delete", chatId)}`,
+                  callback_data: `delete_${thisRepetition._id}`,
                 },
                 {
                   text: `📋 ${await t("Others", chatId)}`,
                   callback_data: `get_list_${thisRepetition._id}`,
                 },
-              ],
+              ]
             ]),
           },
         );
