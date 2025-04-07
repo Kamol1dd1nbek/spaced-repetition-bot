@@ -281,16 +281,6 @@ ${
       }
       break;
 
-    case data.startsWith("response_"):
-      repetitionId = data.split("_")[1];
-      // there is hard code: userId
-      if(await updateCard(1, repetitionId, data.split("_")[2] * 1) === false) {
-        return answerCallbackQuery(queryId, "Repetition not found");
-      }
-      await show_menu(queryId, chatId);
-      await answerCallbackQuery(queryId, "Next repetition date updated");
-      break;
-
     case data.startsWith("get_list_"):
       repetitionId = data.split("_")[2];
       if (repetitionId !== "null") {
@@ -310,6 +300,15 @@ ${
       });
       await show_menu(queryId, chatId);
       break;
+
+    case data.startsWith("response_"):
+      repetitionId = data.split("_")[1];
+      // there is hard code: userId
+      if(await updateCard(1, repetitionId, data.split("_")[2] * 1) === false) {
+        return answerCallbackQuery(queryId, "Repetition not found");
+      }
+      
+      await answerCallbackQuery(queryId, "Next repetition date updated");
 
     case data === "show_list":
       paginationData = await context.getContext(chatId, "pagination");
@@ -459,7 +458,7 @@ ${
                 },
                 {
                   text: `📋 ${await t("Others", chatId)}`,
-                  callback_data: `get_list_${thisRepetition._id}`,
+                  callback_data: `show_list`,
                 },
               ]
             ]),
@@ -535,7 +534,7 @@ ${
                 },
                 {
                   text: `📋 ${await t("Others", chatId)}`,
-                  callback_data: `get_list_${thisRepetition._id}`,
+                  callback_data: `show_list`,
                 },
               ]
             ]),
