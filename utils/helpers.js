@@ -112,44 +112,49 @@ async function clearTrash(chatId, msgId) {
 }
 
 function formatText(text) {
-  let result = "";
-  let commandsAlpha = ["b", "c", "i", "u", "s"];
+  const commandsMap = {
+    ".b": "*",   // bold
+    ".i": "_",   // italic
+    ".u": "__",  // underline
+    ".s": "~",   // strikethrough
+    ".c": "```"  // code block
+  };
+
   const markdownChars = [
-    "_",
-    "*",
-    "[",
-    "]",
-    "(",
-    ")",
-    "~",
-    "`",
-    ">",
-    "#",
-    "+",
-    "-",
-    "=",
-    "|",
-    "{",
-    "}",
-    ".",
-    "!",
-    ",",
+    "_", "*", "[", "]", "(", ")", "~", "`", ">", "#",
+    "+", "-", "=", "|", "{", "}", ".", "!", ","
   ];
+
+  // 1. Escape all markdown chars first (excluding format codes for now)
+  let escaped = "";
   for (let i = 0; i < text.length; i++) {
-    if (text[i] == "." && commandsAlpha.includes(text[i + 1])) {
-      result += `.${text[i++ + 1]}`;
-    } else if (markdownChars.includes(text[i])) {
-      result += `\\${text[i]}`;
+    const char = text[i];
+    const isFormatDot = char === '.' && i + 1 < text.length && commandsMap.hasOwnProperty(`.${text[i + 1]}`);
+    if (markdownChars.includes(char) && !isFormatDot) {
+      escaped += `\\${char}`;
     } else {
-      result += text[i];
+      escaped += char;
     }
   }
-  return result
-    .replace(/\.c/g, "```")
-    .replace(/\.b/g, "*")
-    .replace(/\.i/g, "_")
-    .replace(/\.u/g, "__")
-    .replace(/\.s/g, "~");
+
+  // 2. Replace format commands only if they are surrounded by spaces
+  for (const [cmd, symbol] of Object.entries(commandsMap)) {
+    const regex = new RegExp(`(?<=\\s)\\${cmd}(?=\\s)`, 'g'); // strictly space before and after
+    escaped = escaped.replace(regex, ` ${symbol} `); // keep spaces to preserve structure
+  }
+
+  // 3. Clean up any spaces inside formatting symbols
+  escaped = escaped.replace(/\*\s+/g, '*')
+                   .replace(/\s+\*/g, '*')
+                   .replace(/_\s+/g, '_')
+                   .replace(/\s+_/g, '_')
+                   .replace(/__\s+/g, '__')
+                   .replace(/\s+__/g, '__')
+                   .replace(/~\s+/g, '~')
+                   .replace(/\s+~/g, '~')
+                   .replace(/```(\s+)?/g, '```');
+
+  return escaped;
 }
 
 function addTimeStringToDate(initialDate, timeString) {
