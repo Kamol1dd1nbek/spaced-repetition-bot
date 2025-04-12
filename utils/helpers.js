@@ -125,25 +125,31 @@ function formatText(text) {
     "+", "-", "=", "|", "{", "}", ".", "!", ","
   ];
 
-  // 1. Escape all markdown chars first (excluding format codes for now)
+  // 1. Escape markdown chars (including dot), but skip when it’s a standalone format code surrounded by spaces
   let escaped = "";
   for (let i = 0; i < text.length; i++) {
     const char = text[i];
-    const isFormatDot = char === '.' && i + 1 < text.length && commandsMap.hasOwnProperty(`.${text[i + 1]}`);
-    if (markdownChars.includes(char) && !isFormatDot) {
+
+    const isFormatCode =
+      char === '.' &&
+      i + 1 < text.length &&
+      commandsMap.hasOwnProperty(`.${text[i + 1]}`) &&
+      ((i - 1 < 0 || text[i - 1] === ' ') && (i + 2 >= text.length || text[i + 2] === ' '));
+
+    if (markdownChars.includes(char) && !isFormatCode) {
       escaped += `\\${char}`;
     } else {
       escaped += char;
     }
   }
 
-  // 2. Replace format commands only if they are surrounded by spaces
+  // 2. Replace format commands only if surrounded by real spaces
   for (const [cmd, symbol] of Object.entries(commandsMap)) {
-    const regex = new RegExp(`(?<=\\s)\\${cmd}(?=\\s)`, 'g'); // strictly space before and after
-    escaped = escaped.replace(regex, ` ${symbol} `); // keep spaces to preserve structure
+    const regex = new RegExp(`(?<=\\s)\\${cmd}(?=\\s)`, 'g');
+    escaped = escaped.replace(regex, ` ${symbol} `);
   }
 
-  // 3. Clean up any spaces inside formatting symbols
+  // 3. Remove extra spaces inside format marks
   escaped = escaped.replace(/\*\s+/g, '*')
                    .replace(/\s+\*/g, '*')
                    .replace(/_\s+/g, '_')
